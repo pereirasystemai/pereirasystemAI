@@ -1,0 +1,232 @@
+; TRADE ---------------------------------------------------
+;(chat-local-to-self "> 6. Trade Loaded")(disable-self))
+; ALL AGES TRADE RULES
+(defrule ;BUY WOOD
+	(can-buy-commodity wood)
+    (gold-amount > 1600)
+    (wood-amount < 300)
+=>
+    (buy-commodity wood)
+    ;(chat-local-to-self "BUYING WOOD (GOLD > 1600)")
+)
+(defrule ;BUY FOOD
+	(can-buy-commodity food)
+    (gold-amount > 1600)
+    (food-amount < 300)
+=>
+    (buy-commodity food)
+    ;(chat-local-to-self "BUYING FOOD (GOLD > 1600)")
+)
+(defrule ;BUY FOOD
+	(can-buy-commodity food)
+    (gold-amount > 500)
+    (food-amount < 50)
+=>
+    (buy-commodity food)
+    ;(chat-local-to-self "BUYING FOOD (FOOD < 50)")
+)
+; FEUDAL AGE TRADE
+(defrule
+    (current-age == feudal-age)
+    (wood-amount > 500)
+    (can-sell-commodity wood)
+=>
+    (sell-commodity wood)
+    ;(chat-local-to-self "SELLING WOOD (> 500)")
+)
+(defrule
+    (current-age == feudal-age)
+    (can-sell-commodity food)
+    (food-amount > 900)
+    (or ; maybe remove this
+         (wood-amount < 200)
+         (stone-amount < 200)
+    )
+	(gold-amount < 1100)
+=>
+    (sell-commodity food)
+    ;(chat-local-to-self "SELLING FOOD (> 900)")
+)
+(defrule
+	(current-age == feudal-age)
+	(can-buy-commodity food)
+    (gold-amount > 300)(food-amount < 800)
+=>
+    (buy-commodity food)
+    ;(chat-local-to-self "BUYING FOOD (GOLD > 300)")
+)
+(defrule
+	(current-age == feudal-age)
+	(can-sell-commodity stone)
+    (gold-amount < 200)(food-amount > 600)
+    (research-available castle-age)
+=>
+    (sell-commodity stone)
+    ;(chat-local-to-self "SELLING STONE TO GET TO CASTLE AGE")
+)
+; CASTLE AGE TRADE
+(defrule
+    (current-age == castle-age)
+    (wood-amount > 600)
+    (can-sell-commodity wood)
+=>
+    (sell-commodity wood)
+    ;(chat-local-to-self "SELLING WOOD (> 600)")
+)
+(defrule
+    (current-age == castle-age)
+    (building-type-count monastery > 0)
+    (and(building-type-count siege-workshop == 0)
+    (building-type-count university == 0))
+    (wood-amount < 400)
+    (gold-amount > 500)
+    (can-buy-commodity wood)
+=>
+    (sell-commodity wood)
+    ;(chat-local-to-self "BUYING WOOD FOR THE SIEGE WORKSHOP / UNIV")
+)
+(defrule
+    (current-age == castle-age) ;
+    (food-amount > 300)
+	(gold-amount < 100)
+    (unit-type-count-total monk-set g:< monkQtyLow)
+    (can-sell-commodity food)
+=>
+    (sell-commodity food)
+    ;(chat-local-to-self "SELLING FOOD TO BUY PRIESTS")
+)
+(defrule
+	(current-age == castle-age)
+    (gold-amount > 900)(food-amount < 800)
+	(can-buy-commodity food)
+=>
+    (buy-commodity food)
+    ;(chat-local-to-self "BUYING FOOD TO GET TO IMPERIAL AGE")
+)
+; IMPERIAL AGE TRADE
+(defrule ;SELL WOOD
+    (current-age == imperial-age)
+    (wood-amount > 1600)
+    (gold-amount < 1000)
+    (can-sell-commodity wood)
+=>
+    (sell-commodity wood)
+    ;(chat-local-to-self "SELLING WOOD (> 1600)")
+)
+(defrule
+    (current-age == imperial-age)
+    (food-amount > 2200)
+	(gold-amount < 1000)
+    (can-sell-commodity food)
+=>
+    (sell-commodity food)
+    ;(chat-local-to-self "SELLING FOOD (> 2400)")
+)
+(defrule
+    (current-age == imperial-age)
+    (not(civ-selected cumans));to get mercs
+    (not(civ-selected sicilians)) ;to build donjons
+    (not(civ-selected bulgarians)) ;to build krepost
+    (building-type-count castle >= 3)
+    (not(can-build bombard-tower))
+    (stone-amount > 300)
+	(gold-amount < 1000)
+    (can-sell-commodity stone)
+=>
+    (sell-commodity stone)
+    ;(chat-local-to-self "SELLING STONE (> 300), 3 CASTLES AND NO B.T.")
+)
+(defrule ;imperial age with no castle, we buy stone
+    (current-age == imperial-age)
+    (building-type-count-total castle == 0)
+    (stone-amount < 650)
+    (not(civ-selected frankish))(not(civ-selected incan))
+	(can-buy-commodity stone)
+=>
+    (buy-commodity stone)
+    ;(chat-local-to-self "BUYING STONE (NO CASTLE)")
+)
+(defrule ;imperial age with no castle, we buy stone
+    (current-age == imperial-age)
+    (building-type-count-total castle == 0)
+    (stone-amount < 650)
+    (not(civ-selected frankish))
+	(can-buy-commodity stone)
+=>
+    (buy-commodity stone)
+    ;(chat-local-to-self "BUYING STONE (NO CASTLE)")
+)
+(defrule ;imperial age with no castle, we buy stone
+    (current-age == imperial-age)
+    (building-type-count-total castle == 0)
+    (stone-amount < 488)
+	(can-buy-commodity stone)
+=>
+    (buy-commodity stone)
+    ;(chat-local-to-self "BUYING STONE (NO CASTLE)")
+)
+; TRIBUTE, just randomly give resources to anyone for now
+; TRIBUTE IN FEUDAL AGE
+; TRIBUTE IN IMPERIAL AGE
+(defrule
+    (current-age == imperial-age)
+    (wood-amount > 1600)
+    (players-current-age any-ally < imperial-age)
+    (up-allied-resource-amount any-ally wood < 200)
+=>
+    (tribute-to-player this-any-ally wood 500)
+)
+(defrule
+    (current-age == imperial-age)
+    (food-amount > 2100)
+    (players-current-age any-ally < imperial-age)
+        (up-allied-resource-amount any-ally food < 200)
+=>
+    (tribute-to-player this-any-ally food 500)
+)
+(defrule
+    (current-age == imperial-age)
+    (gold-amount > 2000)
+    (players-current-age any-ally < imperial-age)
+    (up-allied-resource-amount any-ally gold < 200)
+=>
+    (tribute-to-player this-any-ally gold 500)
+)
+(defrule
+    (current-age == imperial-age)
+    (building-type-count castle > 0)
+    (players-building-type-count any-ally castle == 0)
+    (up-allied-resource-amount any-ally stone < 650)
+    (stone-amount > 800)
+=>
+    (tribute-to-player this-any-ally stone 650)
+)
+; BIG QTY
+(defrule
+    (current-age == imperial-age)
+    (wood-amount > 4000)
+    (up-allied-resource-amount any-ally wood < 2000)
+=>
+    (tribute-to-player this-any-ally wood 1000)
+)
+(defrule
+    (current-age == imperial-age)
+    (food-amount > 4000)
+    (up-allied-resource-amount any-ally food < 2000)
+=>
+    (tribute-to-player this-any-ally food 1000)
+)
+(defrule
+    (current-age == imperial-age)
+    (gold-amount > 4000)
+    (up-allied-resource-amount any-ally gold < 2000)
+=>
+    (tribute-to-player this-any-ally gold 1000)
+)
+(defrule
+    (current-age == imperial-age)
+    (stone-amount > 4000)
+    (up-allied-resource-amount any-ally stone < 2000)
+=>
+    (tribute-to-player this-any-ally stone 1000)
+)

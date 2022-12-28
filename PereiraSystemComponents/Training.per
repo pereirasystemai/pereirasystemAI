@@ -1,0 +1,2197 @@
+; TRAINING -------------------------------------------------------
+(defrule(true)=>(chat-local-to-self "> 5. Training Loaded")(disable-self))
+; CIVILIAN UNITS
+; VILLAGERS
+(defrule
+    (civilian-population  < 7)
+    (can-train villager)
+=>
+    (train villager)
+)
+(defrule
+    (current-age == dark-age)
+    (food-amount < 50000)(wood-amount < 50000)
+    (not
+        (and
+            (research-available feudal-age)
+            (food-amount g:>= feudalAgeFoodCost)
+        )
+    )
+    (civilian-population  g:< maxCiviliansDarkAge)
+    (can-train villager)
+=>
+    (train villager)
+)
+(defrule
+    (current-age == feudal-age)
+    (food-amount < 50000)(wood-amount < 50000)
+    (not
+        (and
+            ;(research-available castle-age)
+            (up-research-status c: castle-age == research-available)
+            (and
+                (food-amount g:>= castleAgeFoodCost)
+                (gold-amount g:>= castleAgeGoldCost)
+            )
+        )
+    )
+    (civilian-population g:< maxCiviliansFeudalAge)
+    (can-train villager)
+=>
+    (train villager)
+)
+(defrule
+    (current-age == castle-age)
+    (food-amount < 50000)(wood-amount < 50000)  
+    (not
+        (and
+            (research-available imperial-age)
+            (and
+                (food-amount g:>= imperialAgeFoodCost)
+                (gold-amount g:>= imperialAgeGoldCost)
+            )
+        )
+    )
+    (civilian-population g:< maxCiviliansCastleAge)
+    (can-train villager)
+=>
+    (train villager)
+)
+; villagers imperial age
+(defrule
+    (current-age == imperial-age)(food-amount < 50000)
+    (civilian-population g:< maxCiviliansCastleAge)
+    (can-train villager)
+=>
+    (train villager)
+)
+(defrule
+    (current-age == imperial-age) ;save some food for soldiers after age change
+    (or(military-population > 55)(food-amount > 400))
+    (or(food-amount < 12000)(unit-type-count-total villager < 10))
+    (civilian-population g:< maxCiviliansImperialAge)
+    (can-train villager)
+=>
+    (train villager)
+)
+; TRADE CARTS
+(defrule
+    (players-building-type-count any-ally market > 0)
+    (unit-type-count-total trade-cart < 1)
+    (wood-amount > 150)
+    (military-population > 10)
+    (can-train trade-cart)
+=>
+	(train trade-cart)
+)
+(defrule
+    (or(building-type-count siege-workshop > 0)
+    (building-type-count monastery > 0))
+    (or(building-type-count university > 0)
+    (building-type-count monastery > 0))
+    (players-building-type-count any-ally market > 0)
+    (unit-type-count-total trade-cart < 3)
+    (wood-amount > 250)
+    (military-population > 10)
+    (can-train trade-cart)
+=>
+	(train trade-cart)
+)
+(defrule
+    (or(current-age == imperial-age)(up-research-status c: imperial-age == research-pending))
+    (players-building-type-count any-ally market > 0)
+    (unit-type-count-total trade-cart < 3)
+    (civilian-population < 100)
+    (military-population > 4)
+    (can-train trade-cart)
+=>
+	(train trade-cart)
+)
+(defrule
+    (or(current-age == imperial-age)(up-research-status c: imperial-age == research-pending))
+    (players-building-type-count any-ally market > 0)
+    (unit-type-count-total trade-cart < 6)
+    (civilian-population < 100)
+    (military-population > 8)
+    (can-train trade-cart)
+=>
+	(train trade-cart)
+)
+(defrule
+    (current-age == imperial-age)
+    (players-building-type-count any-ally market  > 0)
+    (unit-type-count-total trade-cart g:< tradeCartsQty)
+    (civilian-population < 100)(military-population > 50)
+=>
+	(train trade-cart)
+)
+; TRADE SHIP
+(defrule
+    (players-building-type-count any-ally dock > 0)
+    (unit-type-count-total trade-cog == 0)
+    (can-train trade-cog)
+=>
+	(train trade-cog)
+)
+; FISHING SHIPS
+(defrule
+    (up-gaia-type-count-total c: ocean-fish-class > 0)
+    (can-train fishing-ship)
+=>
+	(train fishing-ship)
+    (chat-local-to-self ">>> Ocean Fish Detected")
+    (disable-self)
+)
+(defrule
+    (up-gaia-type-count-total c: ocean-fish-class > 1)
+    (unit-type-count-total fishing-ship g:< fishingShipsQty)
+=>
+	(train fishing-ship)
+)
+; FISH TRAPS
+(defrule
+    (can-build fish-trap)
+    (building-type-count-total fish-trap < 1)
+=>
+	(build fish-trap)
+)
+; MILITARY UNITS
+; MONASTERY
+; CASTLE AGE MONKS
+(defrule
+    (current-age == castle-age)
+    (and
+        (unit-type-count-total monk g:< monkQtyLow)
+        (unit-type-count-total 286 g:< monkQtyLow)
+    )
+    (not(hold-relics))(not(enemy-buildings-in-town))
+    (can-train monk)
+=>
+    (train monk)
+)
+(defrule
+    (current-age == castle-age)
+    (or
+        (civ-selected bohemians)(civ-selected byzantine)
+    )
+    (and
+    (unit-type-count-total monk g:< monkQtyMedium)
+    (unit-type-count-total 286 g:< monkQtyMedium)
+    )
+    (not(hold-relics))(not(enemy-buildings-in-town))
+    (can-train monk)
+=>
+    (train monk)
+)
+;IMPERIAL AGE MONKS
+(defrule ;bengalis ?
+    (current-age == imperial-age)
+    (or
+        (civ-selected bohemians)(civ-selected bohemians)
+    )
+    (unit-type-count-total monk g:< monkQtyMedium)
+    (can-train monk)
+=>
+    (train monk)
+)
+(defrule
+    (current-age == imperial-age)
+    (or
+        (or
+            (civ-selected mayan)
+            (civ-selected byzantine)
+        )
+        (or
+            (civ-selected teutonic)
+            (civ-selected saracen)
+        )
+    )
+    (gold-amount > 400)
+    (unit-type-count-total monk g:< monkQtyHigh)
+    (can-train monk)
+=>
+    (train monk)
+)
+(defrule
+    (current-age == imperial-age)
+    (or
+        (or
+            (civ-selected aztec)
+            (civ-selected aztec)
+        )
+        (or
+            (civ-selected aztec)
+            (civ-selected aztec)
+        )
+    )
+    (gold-amount > 400)
+    (unit-type-count-total monk g:< monkQtyHigh)
+    (can-train monk)
+=>
+    (train monk)
+)
+(defrule
+    (current-age == imperial-age)
+    (gold-amount > 1200)
+    (can-train missionary)
+=>
+    (train missionary)
+)
+; MONKS FOR RELIC TRANSFUSION
+(defrule
+    (or
+        (civ-selected burgundians)(civ-selected aztec)
+    )
+    (or
+        (hold-relics)
+        (not(enemy-captured-relics))
+    )
+    (and
+        (unit-type-count-total monk g:< monkQtyLow)
+        (unit-type-count-total 286 g:< monkQtyLow)
+    )
+    (can-train monk)
+=>
+    (train monk)
+)
+; CASTLE
+; TREBUCHET
+(defrule
+    (or(military-population > 20)(enemy-buildings-in-town))
+    (and
+        (unit-type-count-total trebuchet g:< trebuchetsQtyLow)
+        (unit-type-count-total 954 g:< trebuchetsQtyLow)
+    )
+    (not(civ-selected gothic))
+    (not
+        (and(civ-selected bohemians)(can-train bombard-cannon))
+    )
+    (not
+        (and(civ-selected burgundians)(can-train bombard-cannon))
+    )
+    (not(up-research-status c: 787 == research-available))
+    (can-train trebuchet)
+=>
+    (train trebuchet)
+)
+(defrule
+    (civ-selected hun)
+    (and
+        (unit-type-count-total trebuchet g:< trebuchetsQtyMedium)
+        (unit-type-count-total 954 g:< trebuchetsQtyMedium)
+    )
+    (can-train trebuchet)
+=>
+    (train trebuchet)
+)
+(defrule
+    (or
+        (or
+            (and(civ-selected tatars)(research-completed my-unique-research))
+            (and(civ-selected japanese)(research-completed my-unique-research))
+        )
+        (and(civ-selected briton)(research-completed my-unique-research))
+    )
+    (and
+        (unit-type-count-total trebuchet g:< trebuchetsQtyHigh)
+        (unit-type-count-total 954 g:< trebuchetsQtyHigh)
+    )
+    (wood-amount > 1000)(gold-amount > 1000)
+    (can-train trebuchet)
+=>
+    (train trebuchet)
+)
+; PETARD
+(defrule
+    (current-age == imperial-age)
+    (civ-selected saracen)(gold-amount > 2100)
+    (can-train petard)
+=>
+    (train petard)
+)
+; UNIQUE UNIT
+(defrule ;flemish militia
+    (can-train flemish-pikeman)
+=>
+    (train flemish-pikeman)
+)
+(defrule ;flemish militia
+    (can-train 1699)
+=>
+    (train 1699)
+)
+; CASTLE AGE DEFENSE UU
+(defrule
+    (current-age == castle-age)
+    (town-under-attack)(gold-amount > 860)
+    (unit-type-count-total my-unique-unit-line g:< uniqueUnitQtyLow)
+    (can-train my-unique-unit-line)
+=>
+    (train my-unique-unit-line)
+)
+; IMPERIAL AGE PRE UPGRADE UU
+; UNIQUE UNITS WHOSE UPGRADE COSTS SAME RESOURCE, MAKE ONLY A FEW
+; MAGYAR DONT MAKE THEM UNTIL UPGRADE
+(defrule
+	(current-age == imperial-age)(gold-amount > 500)
+    (not(research-completed my-unique-unit-upgrade))
+    (or
+        (or
+            (or
+                (civ-selected byzantine)(civ-selected celtic)
+            )
+            (or
+                (civ-selected gothic)(civ-selected japanese)
+            )
+        )
+        (or
+            (or
+                (civ-selected persian)(civ-selected saracen)
+            )
+            (or
+                (civ-selected teutonic)(civ-selected turkish)
+            )
+        )
+    )
+    (up-compare-goal nonUpgradedUniqueUnitsCreated < 6)
+    (can-train my-unique-unit-line)
+=>
+	(train my-unique-unit-line)
+    (up-modify-goal nonUpgradedUniqueUnitsCreated c:+ 1)
+)
+(defrule
+	(current-age == imperial-age)(gold-amount > 500)
+    (not(research-completed my-unique-unit-upgrade))
+    (or
+        (or
+            (or
+                (civ-selected viking)(civ-selected korean)
+            )
+            (or
+                (civ-selected spanish)(civ-selected incan)
+            )
+        )
+        (or
+            (or
+                (civ-selected slavic)(civ-selected ethiopian)
+            )
+            (or
+                (civ-selected malian)(civ-selected khmer)
+            )
+        )
+    )
+    (up-compare-goal nonUpgradedUniqueUnitsCreated < 6)
+    (can-train my-unique-unit-line)
+=>
+	(train my-unique-unit-line)
+    (up-modify-goal nonUpgradedUniqueUnitsCreated c:+ 1)
+)
+(defrule
+	(current-age == imperial-age)(gold-amount > 500)
+    (not(research-completed my-unique-unit-upgrade))
+    (or
+        (or
+            (or
+                (civ-selected malay)(civ-selected bulgarians)
+            )
+            (or
+                (civ-selected lithuanians)(civ-selected tatars)
+            )
+        )
+        (or
+            (or
+                (civ-selected burgundians)(civ-selected sicilians)
+            )
+            (or
+                (civ-selected bohemians)(civ-selected poles)
+            )
+        )
+    )
+    (up-compare-goal nonUpgradedUniqueUnitsCreated < 6)
+    (can-train my-unique-unit-line)
+=>
+	(train my-unique-unit-line)
+    (up-modify-goal nonUpgradedUniqueUnitsCreated c:+ 1)
+)
+(defrule
+	(current-age == imperial-age)(gold-amount > 500)
+    (not(research-completed my-unique-unit-upgrade))
+    (or
+        (or
+            (or
+                (civ-selected dravidians)(civ-selected gurjaras)
+            )
+            (or
+                (civ-selected indian)(civ-selected frankish)
+            )
+        )
+        (civ-selected tatars); repeated
+    )
+    (up-compare-goal nonUpgradedUniqueUnitsCreated < 6)
+    (can-train my-unique-unit-line)
+=>
+	(train my-unique-unit-line)
+    (up-modify-goal nonUpgradedUniqueUnitsCreated c:+ 1)
+)
+; UNIQUE UNITS WHOSE UPGRADE COSTS A --DIFFERENT-- RESOURCE
+; KEEP A SMALL QTY WITH NO TOTAL LIMIT
+; BENGALIS, BERBERS HAVE THEIR OWN SECTION
+(defrule
+    (not(research-completed my-unique-unit-upgrade))
+    (or
+        (or
+            (or
+                (civ-selected briton)(civ-selected chinese)
+            )
+            (or
+                (civ-selected mayan)(civ-selected mongol)
+            )
+        )
+        (or
+            (or
+                (civ-selected italian)(civ-selected portuguese)
+            )
+            (or
+                (civ-selected burmese)(civ-selected vietnamese)
+            )
+        )
+    )
+    (unit-type-count-total my-unique-unit-line g:< uniqueUnitQtyLow)
+    (gold-amount > 460) ;trebuchets and mangonels have priority
+    (can-train my-unique-unit-line)
+=>
+	(train my-unique-unit-line)
+)
+(defrule
+    (not(research-completed my-unique-unit-upgrade))
+    (or
+        (civ-selected cumans)(civ-selected cumans)
+    )
+    (unit-type-count-total my-unique-unit-line g:< uniqueUnitQtyMedium)
+    (gold-amount > 235) ;cav archers at 260
+    (can-train my-unique-unit-line)
+=>
+	(train my-unique-unit-line)
+)
+; IMPERIAL AGE AFTER UPGRADE UU - some civs have own section with less gold limit
+(defrule
+    (current-age == imperial-age)
+    (research-completed my-unique-unit-upgrade)
+    (gold-amount > 350)
+    (not(civ-selected ethiopian))(not(civ-selected gothic))
+    (not(civ-selected berbers))
+    (unit-type-count-total my-unique-unit-line g:< uniqueUnitQtyMedium)
+    (can-train my-unique-unit-line)
+=>
+    (train my-unique-unit-line)
+)
+; BERBER UU - upgrade costs same resource
+(defrule
+    (civ-selected berbers)
+    (not(research-completed my-unique-unit-upgrade))
+	(or(current-age == imperial-age)(gold-amount > 800))
+    (gold-amount > 460)
+    (or(up-compare-goal dudeHasCavalryArchers == 1)
+    (up-compare-goal dudeHasMilitia == 1))
+    (up-compare-goal nonUpgradedUniqueUnitsCreated < 10)
+	(can-train my-unique-unit-line)
+=>
+	(train my-unique-unit-line)
+    (up-modify-goal nonUpgradedUniqueUnitsCreated c:+ 1)
+)
+(defrule
+    (civ-selected berbers)
+    (research-completed my-unique-unit-upgrade)
+	(current-age == imperial-age)
+    (gold-amount > 360)
+    (or(up-compare-goal dudeHasCavalryArchers == 1)
+    (up-compare-goal dudeHasMilitia == 1))
+    (unit-type-count-total my-unique-unit-line g:< uniqueUnitQtyLow)
+	(can-train my-unique-unit-line)
+=>
+	(train my-unique-unit-line)
+)
+; BENGALI UU - upgrade costs different resource
+(defrule
+    (civ-selected bengalis)
+	(current-age == imperial-age)
+    (gold-amount > 360)
+    (or(up-compare-goal dudeHasSpearmen == 1)
+    (up-compare-goal dudeHasMilitia == 1))
+    (unit-type-count-total my-unique-unit-line g:< uniqueUnitQtyMedium)
+	(can-train my-unique-unit-line)
+=>
+	(train my-unique-unit-line)
+    (up-modify-goal nonUpgradedUniqueUnitsCreated c:+ 1)
+    (up-chat-data-to-self "Training Non Upgraded Chariot %d" g: nonUpgradedUniqueUnitsCreated)
+)
+; BRITON UU - upgrade costs different resource
+(defrule
+    (civ-selected briton)
+    ;(research-completed my-unique-unit-upgrade)
+    (wood-amount > 200)(gold-amount > 240)
+    (can-train my-unique-unit-line)
+=>
+    (train my-unique-unit-line)
+)
+;BULGARIANS
+(defrule
+    (civ-selected bulgarians)
+    (not(research-completed my-unique-unit-upgrade))
+    (gold-amount > 211) ;knight has 210
+    (unit-type-count-total my-unique-unit-line g:< uniqueUnitQtyHigh)
+    (can-train my-unique-unit-line)
+=>
+    (train my-unique-unit-line)
+)
+(defrule
+    (civ-selected bulgarians)
+    (research-completed my-unique-unit-upgrade)
+    (gold-amount > 209)
+    (unit-type-count-total my-unique-unit-line g:< uniqueUnitQtyHigh)
+    (can-train my-unique-unit-line)
+=>
+    (train my-unique-unit-line)
+)
+; BURGUNDIANS
+(defrule
+    (civ-selected burgundians)
+    (not(research-completed my-unique-unit-upgrade))
+    (or
+        (current-age == castle-age)(gold-amount > 211)
+    )
+    (unit-type-count-total my-unique-unit-line g:< uniqueUnitQtyHigh)
+    (can-train my-unique-unit-line)
+=>
+    (train my-unique-unit-line)
+)
+(defrule
+    (civ-selected burgundians)
+    (research-completed my-unique-unit-upgrade)
+    (gold-amount > 209)
+    (unit-type-count-total my-unique-unit-line g:< uniqueUnitQtyHigh)
+    (can-train my-unique-unit-line)
+=>
+    (train my-unique-unit-line)
+)
+; CUMANS UU
+(defrule
+    (research-completed my-unique-unit-upgrade)
+    (civ-selected cumans)
+    (unit-type-count-total my-unique-unit-line g:< uniqueUnitQtyHigh)
+    (gold-amount > 235) ;cav archers at 260
+    (can-train my-unique-unit-line)
+=>
+	(train my-unique-unit-line)
+)
+(defrule
+    (can-train mercenary-kipchak)
+=>
+	(train mercenary-kipchak)
+)
+; GOTH UU - goth spam!
+(defrule
+	(civ-selected gothic)
+	(can-train 761)
+=>
+	(train 761)
+    (chat-local-to-self "Training Barracks Huskarl")
+)
+(defrule
+	(civ-selected gothic)
+	(can-train 759)
+=>
+	(train 759)
+    (chat-local-to-self "Training Barracks Huskarl")
+)
+(defrule
+	(civ-selected gothic)
+    (not(can-train 761))(not(can-train 759))
+    (can-train huskarl-line)
+=>
+    (chat-local-to-self "Training Castle Huskarl")
+    (train huskarl-line)
+)
+; HUN UU
+(defrule
+    (can-train stable-tarkan)
+=>
+    (train stable-tarkan)
+    (chat-local-to-self "Training Stable Tarkan")
+)
+; MALAY UU
+(defrule
+    (civ-selected malay)
+    (town-under-attack)
+    (can-train my-unique-unit-line)
+=>
+    (train my-unique-unit-line)
+)
+; SICILIAN UU
+;(defrule(can-train donjon-serjeant-line)=>(train donjon-serjeant-line))
+; TATAR UU
+(defrule
+    (civ-selected tatars)
+	(current-age == imperial-age)
+	(unit-type-count-total my-unique-unit-line g:< uniqueUnitQtyMedium)
+    (gold-amount > 201)
+	(can-train my-unique-unit-line)
+=>
+	(train my-unique-unit-line)
+)
+; VIKING UU
+(defrule
+    (civ-selected viking)
+    (not(research-completed my-unique-unit-upgrade))
+	;(current-age == imperial-age)
+	;(unit-type-count-total my-unique-unit-line g:< uniqueUnitQtyMedium)
+    (gold-amount > 100)
+	(can-train my-unique-unit-line)
+=>
+	(train my-unique-unit-line)
+    (chat-local-to-self "uu")
+)
+(defrule
+    (civ-selected viking)
+    (research-completed my-unique-unit-upgrade)
+	;(current-age == imperial-age)
+	;(unit-type-count-total my-unique-unit-line g:< uniqueUnitQtyMedium)
+    ;(gold-amount > 201)
+	(can-train my-unique-unit-line)
+=>
+	(train my-unique-unit-line)
+    (chat-local-to-self "uu 2")
+)
+; SIEGE WORKSHOP
+; BOMBARD CANNON , trebuchets have better AI
+(defrule
+	(unit-type-count-total houfnice < 12)
+	(can-train houfnice)
+=>
+	(train houfnice)
+)
+(defrule
+    (gold-amount > 350) ;trebuchet priority
+	(unit-type-count-total bombard-cannon < 8)
+	(can-train bombard-cannon)
+=>
+	(train bombard-cannon)
+)
+; MANGONEL
+(defrule
+    (current-age == castle-age)
+    (building-type-count town-center > 0)
+    (unit-type-count-total monk > 2)
+    (unit-type-count-total mangonel-line < 2)
+	(can-train mangonel-line)
+=>
+    (train mangonel-line)
+)
+(defrule
+    (current-age == castle-age)
+    (building-type-count town-center > 0)
+    (unit-type-count-total monk > 3)
+    (unit-type-count-total mangonel-line < 3)
+	(can-train mangonel-line)
+=>
+    (train mangonel-line)
+)
+(defrule
+    (current-age == castle-age)
+    (building-type-count town-center > 0)
+    (unit-type-count-total monk > 4)
+    (unit-type-count-total mangonel-line < 4)
+	(can-train mangonel-line)
+=>
+    (train mangonel-line)
+)
+(defrule
+    (current-age == castle-age) ;rest of mangonels when producing 5th monk, against arch
+    (building-type-count town-center > 0)
+    (unit-type-count-total mangonel-line g:< mangonelQtyLow)
+    (or ;maybe dont check this
+        (up-compare-goal dudeHasArchers == 0)
+        (up-compare-goal dudeHasCavalryArchers == 0)
+    )
+    (or
+        (unit-type-count-total monk > 4)
+        (or
+            (hold-relics)(town-under-attack)
+        )
+    )
+	(can-train mangonel-line)
+=>
+    (train mangonel-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (gold-amount > 251)
+    ;(not(and(civ-selected bohemians)(can-train bombard-cannon)))
+    (not
+        (and(civ-selected burgundians)(can-train bombard-cannon))
+    )
+    (not(unit-type-count-total karambit-warrior-line > 9))
+    (unit-type-count-total mangonel-line g:< mangonelQtyLow)
+    (can-train mangonel-line)
+=>
+    (train mangonel-line)
+)
+(defrule
+    (or
+        (civ-selected korean)
+        (civ-selected celtic)
+    )
+    (current-age == imperial-age)
+	(can-train mangonel-line)
+=>
+    (train mangonel-line)
+)
+; RAM
+(defrule
+    (current-age == feudal-age)
+    (civ-selected cumans)
+    (unit-type-count-total battering-ram-line < 2)
+    (can-train battering-ram-line)
+=>
+	(train battering-ram-line)
+)
+(defrule
+    (current-age == castle-age)
+	(unit-type-count-total battering-ram-line g:< ramQtyLow)
+    (enemy-buildings-in-town)
+    (military-population > 25)
+    (not(civ-selected gothic))
+    (can-train battering-ram-line)
+=>
+	(train battering-ram-line)
+)
+(defrule
+    (current-age == imperial-age)
+	(unit-type-count-total battering-ram-line g:< enemyBuildingsInTown)
+    (not(civ-selected gothic))
+    (not(civ-selected vietnamese)) ;they block the elephants, maybe put more ele civs here
+    (military-population > 40)
+    (not
+        (and
+            (civ-selected bohemians)
+            (and(gold-amount < 250)(wood-amount < 250))
+        )
+    )
+    (unit-type-count trebuchet-set == 0)
+    (not(can-train trebuchet))
+    (can-train battering-ram-line)
+=>
+	(train battering-ram-line)
+)
+
+; SCORPIONS
+(defrule
+    (current-age == castle-age)
+    (can-train scorpion-line)
+    (unit-type-count-total scorpion-line g:< scorpionQty)
+    (military-population > 45)
+    (civ-selected chinese)
+=>
+    (train scorpion-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (gold-amount > 245)
+    (can-train scorpion-line)
+    (unit-type-count-total scorpion-line g:< scorpionQty)
+    (or
+        (or
+            (or
+                (or
+                    (civ-selected viking)
+                    (civ-selected celtic)
+                )
+                (or
+                    (civ-selected mongol)
+                    (civ-selected berbers)
+                )
+            )
+            (or
+                (or
+                    (civ-selected teutonic)
+                    (civ-selected slavic)
+                )
+                (or
+                    (civ-selected burmese)
+                    (civ-selected sicilians)
+                )
+            )
+        )
+        (or
+            (or
+                (or
+                    (civ-selected ethiopian)
+                    (civ-selected chinese)
+                )
+                (or
+                    (civ-selected magyar)
+                    (civ-selected malay)
+                )
+            )
+            (or
+                (civ-selected incan)
+                (civ-selected japanese)
+            )
+        )
+    )
+=>
+    (train scorpion-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (gold-amount > 645)
+    (can-train scorpion-line)
+    (unit-type-count-total scorpion-line g:< scorpionQty)
+    (or
+        (civ-selected tatars)
+        (civ-selected tatars)
+    )
+=>
+    (train scorpion-line)
+)
+(defrule
+    (current-age == imperial-age)(research-completed my-unique-research)
+    (can-train scorpion-line)
+    (wood-amount > 200)
+    (civ-selected khmer)
+=>
+    (train scorpion-line)
+)
+; SIEGE ELEPHANT
+(defrule
+    (current-age == castle-age)(food-amount > 400)(gold-amount > 300)
+	(unit-type-count-total armored-elephant-line g:< ramQtyLow)
+    (or(enemy-buildings-in-town)(military-population > 45))
+    (military-population > 35)
+    (can-train armored-elephant-line)
+=>
+	(train armored-elephant-line)
+)
+(defrule
+    (current-age == imperial-age)
+	(unit-type-count-total armored-elephant-line g:< ramQtyHigh)
+    (military-population > 45)
+    (gold-amount > 400)
+    (can-train armored-elephant-line)
+=>
+	(train armored-elephant-line)
+)
+; DOCK MILITARY SHIPS
+; SPECIAL SHIPS
+; KOREANS
+(defrule
+    (can-train turtle-ship-line)
+=>
+    (train turtle-ship-line)(disable-self)
+)
+(defrule
+    (building-type-count-total dock > 1)
+    (unit-type-count-total turtle-ship-line < 4)
+    (can-train turtle-ship-line)
+=>
+    (train turtle-ship-line)
+)
+; VIKINGS
+(defrule
+    (can-train longboat-line)
+=>
+    (train longboat-line)(disable-self)
+)
+(defrule
+    (building-type-count-total dock > 1)
+    (unit-type-count-total longboat-line < 4)
+    (can-train longboat-line)
+=>
+    (train longboat-line)
+)
+; PORTUGUESE
+(defrule
+    (can-train caravel-line)
+=>
+    (train caravel-line)(disable-self)
+)
+(defrule
+    (building-type-count-total dock > 1)
+    (unit-type-count-total caravel-line < 4)
+    (can-train caravel-line)
+=>
+    (train caravel-line)
+)
+; CANNON GALLEON
+(defrule
+    (building-type-count-total dock > 1)
+    (unit-type-count-total cannon-galleon-line < 4)
+    (can-train cannon-galleon-line)
+=>
+    (train cannon-galleon-line)
+)
+; GALLEY
+(defrule
+    (can-train galley-line)
+=>
+    (train galley-line)
+    (disable-self)
+)(defrule
+    (can-train galley-line)
+=>
+    (train galley-line)
+    (disable-self)
+)
+(defrule
+    (building-type-count-total dock > 1)
+    (up-compare-goal dudeHasExplosiveShips == 1)
+    (wood-amount > 350)
+    (unit-type-count-total galley-line < 4)
+    (can-train galley-line)
+=>
+    (train galley-line)
+)
+; FIRE SHIP
+(defrule
+    (or(up-compare-goal dudeHasGalleys == 1)
+    (up-compare-goal dudeHasCannonShips == 1))
+    (unit-type-count-total fire-ship-line < 4)
+    (can-train fire-ship-line)
+=>
+    (train fire-ship-line)
+)
+; DEMO SHIP
+(defrule
+    (up-compare-goal dudeHasFireShips == 1)
+    (wood-amount > 350)
+    (unit-type-count-total demolition-ship-line < 1)
+    (can-train demolition-ship-line)
+=>
+    (train demolition-ship-line)
+)
+; STABLE
+; STEPPE LANCER
+(defrule
+    (current-age == castle-age)
+    (or(unit-type-count-total monk > 4)(hold-relics))
+    (unit-type-count-total steppe-lancer-line g:< knightsQtyLow)
+    (can-train steppe-lancer-line)
+=>
+    (train steppe-lancer-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (unit-type-count-total steppe-lancer-line g:< knightsQtyMedium)
+    (not
+        (and(up-compare-goal dudeHasCavalry == 1)
+            (can-train camel-line))
+    )
+    (not(can-train steppe-lancer-line))
+    (can-train steppe-lancer-line)
+=>
+    (train steppe-lancer-line)
+)
+; ELEPHANTS
+(defrule
+    (current-age == castle-age)
+    (or(unit-type-count-total monk > 4)(hold-relics))
+    (unit-type-count-total battle-elephant-line < 4)
+    (not
+        (and(up-compare-goal dudeHasCavalry == 1)
+            (can-train camel-line))
+    )
+    (can-train battle-elephant-line)
+=>
+    (train battle-elephant-line)
+)
+(defrule
+    (current-age == imperial-age)(gold-amount > 270)
+	(not(civ-selected khmer))
+    (can-train battle-elephant-line)
+=>
+    (train battle-elephant-line)
+)
+; SCOUTS
+; DISABLE SELF SCOUTS
+(defrule
+	(can-train scout-cavalry-line)
+=>
+    (train scout-cavalry-line)
+    (up-modify-goal totalSoldiersCreatedThisAge c:+ 1)(disable-self)
+)
+(defrule
+	(can-train scout-cavalry-line)
+=>
+    (train scout-cavalry-line)
+    (up-modify-goal totalSoldiersCreatedThisAge c:+ 1)(disable-self)
+)
+; FEUDAL AGE SCOUTS
+(defrule
+	(current-age == feudal-age) ; just cause they are good
+    (research-completed ri-wheel-barrow)
+    (or
+        (or(civ-selected mongol)(civ-selected turkish))
+        (or(civ-selected sicilians)(civ-selected burgundians))
+    )
+    (up-compare-goal totalSoldiersCreatedThisAge g:< maximumSoldiersFeudal)
+	(unit-type-count-total scout-cavalry-line g:< scoutsQtyLow)
+	(can-train scout-cavalry-line)
+=>
+    (train scout-cavalry-line)
+    (up-modify-goal totalSoldiersCreatedThisAge c:+ 1)
+)
+(defrule
+	(current-age == feudal-age) ; counter to archers
+    (town-under-attack)
+    (or(up-compare-goal dudeHasArchers == 1)
+    (up-compare-goal dudeHasSkirmishers == 1))
+    (not(civ-selected celtic))
+    (not(civ-selected japanese))
+    (not(civ-selected portuguese))
+	(unit-type-count-total scout-cavalry-line g:< scoutsQtyMedium)
+	(can-train scout-cavalry-line)
+=>
+    (train scout-cavalry-line)
+    (up-modify-goal totalSoldiersCreatedThisAge c:+ 1)
+)
+; CASTLE AGE SCOUTS
+(defrule
+	(current-age == castle-age)
+    (or(research-completed ri-hand-cart)(town-under-attack))
+    (or(up-compare-goal dudeHasArchers == 1)
+    (up-compare-goal dudeHasSkirmishers == 1))
+    (unit-type-count-total scout-cavalry-line g:< scoutsQtyLow)
+	(can-train scout-cavalry-line)
+=>
+    (train scout-cavalry-line)
+)
+(defrule
+	(current-age == castle-age)
+    (town-under-attack)(food-amount > 1300)
+    (or(up-compare-goal dudeHasArchers == 1)
+    (up-compare-goal dudeHasSkirmishers == 1))
+    ;(up-compare-goal dudeHasSpearmen == 0)
+    (not(civ-selected japanese))
+    (unit-type-count-total scout-cavalry-line g:< scoutsQtyMedium)
+	(can-train scout-cavalry-line)
+=>
+    (train scout-cavalry-line)
+)
+; IMPERIAL AGE SCOUTS
+(defrule
+	(current-age == imperial-age)(food-amount > 1500)(gold-amount < 1300)
+    (research-completed ri-hand-cart)(research-completed ri-bow-saw)
+    (research-completed ri-heavy-plow)
+    (not(civ-selected japanese))(not(civ-selected viking))(not(civ-selected gothic))
+    (or(not(civ-selected burmese))(research-completed my-unique-research))
+    (unit-type-count-total scout-cavalry-line g:< scoutsQtyMedium)
+	(can-train scout-cavalry-line)
+=>
+    (train scout-cavalry-line)
+)
+(defrule
+	(can-train scout-cavalry-line)
+    (research-completed my-unique-research)
+    (civ-selected poles)
+=>
+    (train scout-cavalry-line)
+)
+; CAMEL
+(defrule
+    (current-age == castle-age)
+    ;(up-compare-goal dudeHasCavalry == 1)
+	(unit-type-count-total monk > 4)
+	(unit-type-count-total camel-line g:< camelQtyMedium)
+	(can-train camel-line)
+=>
+    (train camel-line)
+)
+(defrule
+    (current-age == castle-age)
+    (up-compare-goal dudeHasCavalry == 1)
+    (up-compare-goal dudeHasSpearmen == 0)
+	(unit-type-count-total camel-line g:< camelQtyMedium)
+	(can-train camel-line)
+=>
+    (train camel-line)
+)
+(defrule
+	(current-age == imperial-age)
+    (gold-amount > 260)
+	(unit-type-count-total camel-line g:< camelQtyMedium)
+	(can-train camel-line)
+=>
+    (train camel-line)
+)
+; GURJARAS CAVALRY
+(defrule
+	(unit-type-count-total shrivamsha-rider-line g:< camelQtyMedium)
+	(can-train shrivamsha-rider-line)
+=>
+    (train shrivamsha-rider-line)
+)
+; KNIGHTS
+; KNIGHTS IN CASTLE AGE
+(defrule
+    (current-age == castle-age)
+    (or(unit-type-count-total monk > 3)(hold-relics))
+    (unit-type-count-total knight-line g:< knightsQtyLow)
+    (not(can-train battle-elephant-line))
+    (not
+        (and(up-compare-goal dudeHasCavalry == 1)
+            (can-train camel-line))
+    )
+    (not(civ-selected turkish)) ;use light cav
+    (not(civ-selected vietnamese))    ;elephants will improve later
+    (not(civ-selected malay)) ;ele are cheaper
+    (not(can-train steppe-lancer-line))
+    (can-train knight-line)
+=>
+    (train knight-line)
+)
+(defrule
+    (current-age == castle-age)(gold-amount > 220)
+    (unit-type-count-total knight-line g:< knightsQtyLow)
+    (up-compare-goal dudeHasSpearmen == 0)
+    (or
+        (up-compare-goal dudeHasArchers == 1)
+        (or
+            (up-compare-goal dudeHasSkirmishers == 1)
+            (up-compare-goal dudeHasCavalryArchers == 1)
+        )
+    )
+    (or
+        (or
+            (or
+                (civ-selected bulgarians)
+                (civ-selected burgundians)
+            )
+            (or
+                (civ-selected frankish)
+                (civ-selected malian)
+            )
+        )
+        (or
+            (or
+                (civ-selected poles)
+                (civ-selected sicilians)
+            )
+            (civ-selected teutonic)
+        )
+    )
+    (can-train knight-line)
+=>
+    (train knight-line)
+)
+; KNIGHTS IN IMPERIAL AGE
+(defrule
+    (current-age == imperial-age) ;saracen dont even have cavalier
+    (gold-amount > 675)
+    (civ-selected saracen)
+	(unit-type-count-total knight-line g:< knightsQtyMedium)
+    (can-train knight-line)
+=>
+    (train knight-line)
+)
+; CIVS WITH AT LEAST CAVALIER UPGRADE - try to use regional units better
+; bohemians, briton, burmese etc
+(defrule
+    (current-age == imperial-age)
+    (gold-amount > 575)
+    (not(civ-selected saracen))
+	(unit-type-count-total knight-line g:< knightsQtyMedium)
+    (not(can-train steppe-lancer-line))
+    (not(can-train battle-elephant-line))
+    (or(not(civ-selected burmese))(research-completed my-unique-research))
+    (can-train knight-line)
+=>
+    (train knight-line)
+)
+; CIVS WITH PALADIN UPGRADE
+; burg, byz, celt, cumans, franks, huns, lithuanians, magyars, persians, spanish, teutons
+(defrule
+    (current-age == imperial-age)
+    (gold-amount > 475)
+	(unit-type-count-total knight-line g:< knightsQtyMedium)
+    (or
+        (or
+            (or
+                (civ-selected burgundians)
+                (civ-selected byzantine)
+            )
+            (or
+                (civ-selected celtic)
+                (civ-selected cumans); again in good upgrades, maybe not check for steppe lancer here
+            )
+        )
+        (or
+            (or
+                (civ-selected frankish)
+                (civ-selected lithuanians)
+            )
+            (or
+                (civ-selected teutonic)
+                (civ-selected teutonic)
+            )
+        )
+    )
+    (not(can-train steppe-lancer-line))
+    (not(can-train cataphract-line))
+    ;(not(can-train coustillier-line))
+    (can-train knight-line)
+=>
+    (train knight-line)
+)
+; PUT HERE CIVS WITH FULLY UPG PALADIN OR GOOD UPGRADE
+; FU PALADIN:
+(defrule
+    (current-age == imperial-age)
+    (gold-amount > 375)
+	(unit-type-count-total knight-line g:< knightsQtyMedium)
+    (or
+        (or
+            (civ-selected hun)
+            (civ-selected magyar)
+        )
+        (or
+            (civ-selected persian)
+            (civ-selected spanish)
+        )
+    )
+    (can-train knight-line)
+=>
+    (train knight-line)
+)
+; GOOD UPGRADES
+(defrule
+    (current-age == imperial-age)
+    (gold-amount > 375)
+	(unit-type-count-total knight-line g:< knightsQtyMedium)
+    (or
+        (or
+            (civ-selected cumans); maybe steppe lancer only
+            (civ-selected frankish) ;more hp
+        )
+        (or
+            (civ-selected lithuanians) ;attack per relic
+            (civ-selected sicilians) ; defense
+        )
+    )
+    (not(can-train steppe-lancer-line))
+    (can-train knight-line)
+=>
+    (train knight-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (gold-amount > 375)
+	(unit-type-count-total knight-line g:< knightsQtyMedium)
+    (or
+        (civ-selected portuguese)
+        (civ-selected berbers)
+    )
+    (can-train knight-line)
+=>
+    (train knight-line)
+)
+(defrule
+    (civ-selected bulgarians) ;sa
+    (current-age == imperial-age)
+    (gold-amount > 270)
+	(unit-type-count-total knight-line g:< knightsQtyMedium)
+    (not(research-completed my-unique-unit-upgrade))
+    (can-train knight-line)
+=>
+    (train knight-line)
+)
+(defrule
+    (civ-selected poles)
+    (current-age == imperial-age)
+    (gold-amount > 330)
+	(unit-type-count-total knight-line g:< knightsQtyMedium)
+    (research-completed my-second-unique-research)
+    (can-train knight-line)
+=>
+    (train knight-line)
+)
+(defrule
+    (civ-selected malian)
+    (current-age == imperial-age)
+    (gold-amount > 330)
+	(unit-type-count-total knight-line g:< knightsQtyMedium)
+    (research-completed my-unique-research)
+    (can-train knight-line)
+=>
+    (train knight-line)
+)
+; ARCHERY RANGE
+; ARCHER
+(defrule
+    (current-age == feudal-age) ;Cav archer not available
+    (gold-amount > 245)
+    (research-completed ri-wheel-barrow)
+    (can-train archer-line)
+=>
+    (train archer-line)(disable-self)
+)
+(defrule
+    (current-age == feudal-age) ;Cav archer not available
+    (or(up-compare-goal dudeHasSpearmen == 1)
+    (up-compare-goal dudeHasMilitia == 1))
+    (or(gold-amount > 245)(food-amount < 100))
+    (unit-type-count-total archer-line g:< archerQtyLow)
+    (can-train archer-line)
+=>
+    (train archer-line)
+)
+; ARCHERS CASTLE AGE
+(defrule
+    (current-age == castle-age)
+    (research-completed ri-hand-cart)
+    (building-type-count town-center > 0)
+    (or(up-compare-goal dudeHasSpearmen == 1)
+    (up-compare-goal dudeHasMilitia == 1))
+    (wood-amount > 145)
+    (or
+        (and(building-type-count siege-workshop == 0)
+            (building-type-count university == 0)
+        )
+        (wood-amount > 300)
+    )
+	(not(civ-selected gothic))(not(civ-selected mongol))
+    (not(civ-selected frankish))(not(civ-selected cumans)) ;cav arc
+    (not(civ-selected tatars))
+    (not(civ-selected berbers))
+	(unit-type-count-total archer-line g:< archerQtyMedium)
+    (can-train archer-line)
+=>
+	(train archer-line)
+)
+; ARCHERS IMPERIAL AGE
+; CIVS WITH NO CROSSWBOW
+(defrule
+    (current-age == imperial-age)(not(can-train hand-cannoneer))
+    (wood-amount > 525)(gold-amount > 545)
+    (or(civ-selected bulgarians)(civ-selected spanish))
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyLow)
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+; CIVS WITH NO ARBALESTER
+(defrule
+    (current-age == imperial-age)
+    (wood-amount > 525)(gold-amount > 545)
+    (or
+        (or(civ-selected berbers)(civ-selected berbers))
+        (or(civ-selected burmese)(civ-selected gothic))
+    )
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyMedium)
+    (not(can-train hand-cannoneer))
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+(defrule ;civs with cav archer bonus
+    (current-age == imperial-age)
+    (wood-amount > 525)(gold-amount > 545)
+    (or
+        (or(civ-selected mongol)(civ-selected mongol))
+        (or(civ-selected frankish)(civ-selected cumans))
+    )
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyMedium)
+    (not(can-train cavalry-archer))(not(can-train hand-cannoneer))
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+(defrule
+    (current-age == imperial-age)(not(can-train hand-cannoneer))
+    (wood-amount > 525)(gold-amount > 545)
+    (or(civ-selected celtic)
+    (civ-selected burgundians)) ;hc bonus
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyMedium)
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+; huns, franks, vietnamese, mongols, cumans
+; maybe use only if theres spearmen in front
+(defrule ;gurjaras e-a, huns use c-a
+    (current-age == imperial-age)(not(can-train hand-cannoneer))
+    (wood-amount > 525)(gold-amount > 545)
+    (or
+        (or(civ-selected gurjaras)(civ-selected hun))
+        (or(civ-selected indian)(civ-selected lithuanians))
+    )
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyMedium)
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+(defrule
+    (current-age == imperial-age) ;they have better cav archers after ca upg
+    (wood-amount > 525)(gold-amount > 545)
+    (or(civ-selected tatars)(civ-selected turkish))
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyMedium)
+    (or
+        (not(can-train cavalry-archer))
+        (not(research-completed my-second-unique-research))
+    )
+    (not(can-train hand-cannoneer))
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (wood-amount > 525)(gold-amount > 545)
+    (or(civ-selected slavic)(civ-selected teutonic))
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyMedium)
+    (not(can-train hand-cannoneer))
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+; CIVS WITH ARBALESTER NOT FULLY UPG
+(defrule
+    (current-age == imperial-age)
+    (wood-amount > 425)(gold-amount > 445)
+    (or
+        (or(civ-selected aztec)(civ-selected bengalis))
+        (or(civ-selected bohemians)(civ-selected khmer))
+    )
+    (or ; maybe better check if it has anti gunpowder like winged hussar
+        (not(civ-selected bohemians))
+        (not(research-completed ri-chemistry))
+    )
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyMedium)
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (wood-amount > 425)(gold-amount > 445)
+    (or
+        (or(civ-selected malian)(civ-selected mongol))
+        (or(civ-selected poles)(civ-selected khmer))
+    )
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyMedium)
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (wood-amount > 425)(gold-amount > 445)
+    (or
+        (or(civ-selected viking)(civ-selected viking))
+        (or(civ-selected viking)(civ-selected viking))
+    )
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyMedium)
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+; CIVS WITH ARBALESTER UPGRADED
+(defrule
+    (current-age == imperial-age)
+    (wood-amount > 325)(gold-amount > 445)
+    (or
+        (or(civ-selected briton)(civ-selected byzantine))
+        (or(civ-selected chinese)(civ-selected dravidians))
+    )
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyHigh)
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (wood-amount > 325)(gold-amount > 445)
+    (or
+        (or(civ-selected ethiopian)(civ-selected incan))
+        (or(civ-selected japanese)(civ-selected japanese))
+    )
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyHigh)
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (wood-amount > 325)(gold-amount > 445)
+    (civ-selected italian)(not(can-train hand-cannoneer))
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyHigh)
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (wood-amount > 325)(gold-amount > 445)
+    (or
+        (or(civ-selected korean)(civ-selected magyar))
+        (or(civ-selected malay)(civ-selected mayan))
+    )
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyHigh)
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (wood-amount > 325)(gold-amount > 445)
+    (or
+        (or(civ-selected saracen)(civ-selected saracen))
+        (or(civ-selected vietnamese)(civ-selected vietnamese))
+    )
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyHigh)
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (wood-amount > 325)(gold-amount > 445)
+    (civ-selected portuguese)
+    (not(can-train hand-cannoneer))
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyHigh)
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+; SPECIAL ARCHER UPGRADES
+(defrule
+    (current-age == imperial-age)
+    (wood-amount > 225)(gold-amount > 245)
+    (or(civ-selected ethiopian)(civ-selected ethiopian))
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total archer-line g:< archerQtyHigh)
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+(defrule
+    (civ-selected persian)
+    (research-completed my-second-unique-research)
+    (wood-amount > 270)
+    (up-compare-goal dudeHasSpearmen == 1)
+	(unit-type-count-total archer-line g:< archerQtyHigh)
+	(can-train archer-line)
+=>
+	(train archer-line)
+)
+; CAVALRY ARCHER
+(defrule
+    (current-age == castle-age)
+    (or
+        (or
+            (or(civ-selected tatars)(civ-selected mongol))
+            (or(civ-selected hun)(civ-selected cumans))
+        )
+        (or
+            (or(civ-selected frankish)(civ-selected vietnamese))
+            (and(civ-selected turkish)(research-completed my-second-unique-research))
+        )
+    )
+    (gold-amount > 845)(wood-amount > 400)
+	(unit-type-count-total cavalry-archer-line g:< cavalryArcherQtyLow)
+    (can-train cavalry-archer-line)
+=>
+	(train cavalry-archer-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (or(civ-selected frankish)(civ-selected vietnamese))
+    (wood-amount > 200)(gold-amount > 300)
+	(unit-type-count-total cavalry-archer-line g:< cavalryArcherQtyMedium)
+	(can-train cavalry-archer-line)
+=>
+	(train cavalry-archer-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (or
+        (or
+            (or
+                (civ-selected tatars)(civ-selected mongol)
+            )
+            (or
+                (civ-selected hun)(civ-selected cumans)
+            )
+        )
+        (or
+            (and(civ-selected magyar)(research-completed my-unique-research))
+            (and(civ-selected turkish)(research-completed my-second-unique-research))
+        )
+    )
+    (wood-amount > 200)(gold-amount > 260)
+	(unit-type-count-total cavalry-archer-line g:< cavalryArcherQtyHigh)
+	(can-train cavalry-archer-line)
+=>
+	(train cavalry-archer-line)
+)
+; ELEPHANT ARCHER
+(defrule
+    (current-age == castle-age)
+    (gold-amount > 1000)(food-amount > 1000)
+	(unit-type-count-total elephant-archer-line g:< archerQtyLow)
+    (can-train elephant-archer-line)
+=>
+	(train elephant-archer-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (gold-amount > 260)(food-amount > 400) ;leave food for melee units
+	(unit-type-count-total elephant-archer-line g:< archerQtyMedium)
+    (can-train elephant-archer-line)
+=>
+	(train elephant-archer-line)
+)
+; SKIRMISHERS AND GENITOURS
+; GENITOUR
+(defrule
+    (current-age == castle-age)
+    (up-compare-goal dudeHasArchers == 1)
+    (or(wood-amount > 275)(building-type-count town-center > 0))
+    (building-type-count-total monastery > 0)
+    (unit-type-count-total genitour-line g:< skirmisherQtyLow)
+    (can-train genitour-line)
+=>
+    (train genitour-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (up-compare-goal dudeHasArchers == 1)
+    (not(civ-selected khmer))(not(civ-selected spanish))
+    (not(civ-selected sicilians))(not(civ-selected portuguese))
+    (not(civ-selected gothic))
+    (unit-type-count-total genitour-line g:< skirmisherQtyMedium)
+    (can-train genitour-line)
+=>
+    (train genitour-line)
+)
+; SKIRMISHER
+(defrule
+    (current-age == feudal-age)
+    (or(wood-amount > 275)(building-type-count town-center > 0))
+    (or(wood-amount > 135)(building-type-count lumber-camp > 0))
+    (not(can-train genitour))
+    (can-train skirmisher-line)
+=>
+    (train skirmisher-line)(disable-self)
+)
+(defrule
+    (current-age == feudal-age)
+    (or(wood-amount > 275)(building-type-count town-center > 0))
+    (or(wood-amount > 135)(building-type-count lumber-camp > 0))
+    (not(can-train genitour))
+    (can-train skirmisher-line)
+=>
+    (train skirmisher-line)(disable-self)
+)
+(defrule
+    (current-age == feudal-age)
+    (or(up-compare-goal dudeHasArchers == 1)
+    (up-compare-goal dudeHasCavalryArchers == 1))
+    (or(wood-amount > 275)(building-type-count town-center > 0))
+    (or(wood-amount > 135)(building-type-count lumber-camp > 0))
+    (not(can-train genitour))
+    (unit-type-count-total skirmisher-line g:< skirmisherQtyLow)
+    (not(civ-selected portuguese))
+    (can-train skirmisher-line)
+=>
+    (train skirmisher-line)
+)
+(defrule
+    (current-age == castle-age)
+    (up-compare-goal dudeHasArchers == 1)
+    (or(wood-amount > 275)(building-type-count town-center > 0))
+    (wood-amount > 135)   ; <---------------------
+    (or (wood-amount > 235) (building-type-count siege-workshop == 0))
+    (building-type-count-total monastery > 0)
+    (or ;make sure they dont interfer with mangonel creation
+        (and(wood-amount > 400)(gold-amount > 200))
+        (building-type-count siege-workshop == 0)
+    )
+    (not(can-train genitour))
+    (not(civ-selected sicilians))
+    (or
+        (not(civ-selected bohemians))
+        (building-type-count siege-workshop < 0)
+    )
+    (not(can-train mangonel-line))
+    (unit-type-count-total skirmisher-line g:< skirmisherQtyMedium)
+    (can-train skirmisher-line)
+=>
+    (train skirmisher-line)
+)
+(defrule
+    (current-age == imperial-age)
+    (or
+        (or
+            (civ-selected mayan)(civ-selected aztec)
+        )
+        (or
+            (civ-selected dravidians)(civ-selected aztec)
+        )
+    )
+    (food-amount > 150)
+    (wood-amount > 150) ;saving food for heavy units, give priority to spearmen
+    (or(up-compare-goal dudeHasArchers == 1)
+    (up-compare-goal dudeHasCavalryArchers == 1))
+    (not(civ-selected gothic))(not(civ-selected burgundians))
+    (not(can-train genitour))(not(can-train conquistador-line))
+    (unit-type-count-total skirmisher-line g:< skirmisherQtyMedium)
+    (can-train skirmisher-line)
+=>
+    (train skirmisher-line)
+)
+(defrule
+    (current-age == imperial-age) ;not skirmisher civs
+    (gold-amount < 1800)
+    (food-amount > 150)
+    (wood-amount > 150) ;saving food for heavy units, give priority to spearmen
+    (or(up-compare-goal dudeHasArchers == 1)
+    (up-compare-goal dudeHasCavalryArchers == 1))
+    (not(civ-selected gothic))(not(civ-selected burgundians))
+    (not(can-train genitour))(not(can-train conquistador-line))
+    (unit-type-count-total skirmisher-line g:< skirmisherQtyMedium)
+    (can-train skirmisher-line)
+=>
+    (train skirmisher-line)
+)
+; HAND CANNONEER
+; Only Burgundians, Franks and Gurjaras lack fully upgraded Hand Cannoneers,
+(defrule
+    (gold-amount > 250)
+    (or(up-compare-goal dudeHasSpearmen == 1)
+    (up-compare-goal dudeHasMilitia == 1))
+    (unit-type-count-total hand-cannoneer g:< handCannoneerQty)
+    (not(can-train conquistador))
+    (can-train hand-cannoneer)
+=>
+    (train hand-cannoneer)
+)
+; SLINGERS
+(defrule
+    (current-age == imperial-age)
+    (unit-type-count-total slinger g:< skirmisherQtyMedium)
+    (can-train slinger)
+=>
+    (train slinger)
+)
+; BARRACKS
+; MILITIA
+(defrule
+    (can-train militiaman-line)(or(civ-selected incan)(civ-selected aztec))
+=>
+    (train militiaman-line)(disable-self)
+)
+(defrule
+    (can-train militiaman-line)(or(civ-selected incan)(civ-selected aztec))
+=>
+    (train militiaman-line)(disable-self)
+)
+(defrule
+    (current-age == feudal-age)(not(civ-selected sicilians))
+    (gold-amount > 220)
+    (or
+        (not(research-available ri-supplies))
+        (research-completed ri-supplies)
+    )
+    (up-compare-goal totalSoldiersCreatedThisAge g:< maximumSoldiersFeudal)
+    (unit-type-count-total militiaman-line g:< militiaQtyLow)
+    (can-train militiaman-line)
+=>
+    (train militiaman-line)
+    (up-modify-goal totalSoldiersCreatedThisAge c:+ 1)
+)
+; MILITIA CASTLE AGE
+(defrule
+    (current-age == castle-age)
+    (not(civ-selected sicilians))
+    (research-completed ri-hand-cart)
+    (game-time < 900)
+    (gold-amount > 200)
+    (up-compare-goal totalSoldiersCreatedThisAge < 15)
+    (not(can-train steppe-lancer-line))
+    (not(can-train battle-elephant-line))
+    (not(can-train mangonel-line))
+    (can-train militiaman-line)
+=>
+    (train militiaman-line)
+    (up-modify-goal totalSoldiersCreatedThisAge c:+ 1)
+)
+; MILITIA IMPERIAL AGE
+; CIVS WITH NO CHAMPION (excluding mayans)
+(defrule
+    (current-age == imperial-age)(gold-amount > 600)
+    (unit-type-count-total militiaman-line g:< militiaQtyMedium)
+    (up-compare-goal dudeHasSpearmen == 1)
+    (or
+        (or
+            (or
+                (civ-selected bulgarians)
+                (civ-selected ethiopian)
+            )
+            (or
+                (civ-selected gurjaras)
+                (civ-selected hun)
+            )
+        )
+        (or
+            (or
+                (civ-selected khmer)(civ-selected khmer)
+                ;(civ-selected malay) malay no militia until ut research
+            )
+            (or
+                (civ-selected persian)
+                (civ-selected tatars)
+            )
+        )
+    )
+    (not(can-train steppe-lancer-line))
+    (can-train militiaman-line)
+=>
+    (train militiaman-line)
+)
+; CIVS WITH NOT FU CHAMPION, OR NO INTERESTING BONUS
+(defrule
+    (current-age == imperial-age)(gold-amount > 500)
+    (unit-type-count-total militiaman-line g:< militiaQtyMedium)
+    (up-compare-goal dudeHasSpearmen == 1)
+    (or
+        (or
+            (or
+                (civ-selected bengalis)
+                (civ-selected burgundians)
+            )
+            (or
+                (civ-selected byzantine)
+                (civ-selected chinese)
+            )
+        )
+        (or
+            (or
+                (civ-selected cumans)
+                (civ-selected indian)
+            )
+            (or
+                (civ-selected korean)
+                (civ-selected lithuanians)
+            )
+        )
+    )
+    (not(can-train steppe-lancer-line))
+    (can-train militiaman-line)
+=>
+    (train militiaman-line)
+)
+; CIVS WITH NOT FU CHAMPION, OR NO INTERESTING BONUS PART 2
+(defrule
+    (current-age == imperial-age)(gold-amount > 500)
+    (unit-type-count-total militiaman-line g:< militiaQtyMedium)
+    (up-compare-goal dudeHasSpearmen == 1)
+    (or
+        (or
+            (civ-selected magyar)
+            (civ-selected mongol)
+        )
+        (or
+            (civ-selected portuguese)
+            (civ-selected vietnamese)
+        )
+    )
+    (not(can-train steppe-lancer-line))
+    (can-train militiaman-line)
+=>
+    (train militiaman-line)
+)
+; CIVS WITH NOT FU CHAMPION BUT HAVE SOME BONUS
+(defrule
+    (current-age == imperial-age)(gold-amount > 400)
+    (unit-type-count-total militiaman-line g:< militiaQtyMedium)
+    (up-compare-goal dudeHasSpearmen == 1)
+    (or
+        (or
+            (civ-selected celtic) ;speed
+            (civ-selected gothic) ;building attack
+        )
+        (or
+            (civ-selected malian)
+            (civ-selected malian) ;piercer armor
+        )
+    )
+    (can-train militiaman-line)
+=>
+    (train militiaman-line)
+)
+; civs with FU champion and cavalry / camelry
+(defrule
+    (current-age == imperial-age)(gold-amount > 500)
+    (unit-type-count-total militiaman-line g:< militiaQtyMedium)
+    (up-compare-goal dudeHasSpearmen == 1)
+    (or
+        (civ-selected berbers)
+        (civ-selected saracen)
+    )
+    (can-train militiaman-line)
+=>
+    (train militiaman-line)
+)
+; civs with FU champion and cavalry
+(defrule
+    (current-age == imperial-age)(gold-amount > 400)
+    (unit-type-count-total militiaman-line g:< militiaQtyMedium)
+    (up-compare-goal dudeHasSpearmen == 1)
+    (or
+        (or
+            (or
+                (civ-selected bohemians)
+                (civ-selected briton)
+            )
+            (or
+                (civ-selected dravidians)
+                (civ-selected frankish)
+            )
+        )
+        (or
+            (or
+                (civ-selected italian)
+                (civ-selected italian)
+            )
+            (or
+                (civ-selected poles)
+                (civ-selected sicilians)
+            )
+        )
+    )
+    (can-train militiaman-line)
+=>
+    (train militiaman-line)
+)
+(defrule
+    (current-age == imperial-age)(gold-amount > 500)
+    (unit-type-count-total militiaman-line g:< militiaQtyMedium)
+    (up-compare-goal dudeHasSpearmen == 1)
+        (or
+            (or
+                (civ-selected spanish)
+                (civ-selected spanish)
+            )
+            (or
+                (civ-selected spanish)
+                (civ-selected spanish)
+            )
+        )
+    (can-train militiaman-line)
+=>
+    (train militiaman-line)
+)
+; civs with FU champion with BONUS
+(defrule
+    (current-age == imperial-age)(gold-amount > 400)
+    (unit-type-count-total militiaman-line g:< militiaQtyHigh)
+    (up-compare-goal dudeHasSpearmen == 1)
+        (or
+            (or
+                (civ-selected slavic)
+                (civ-selected japanese)
+            )
+            (or
+                (civ-selected teutonic)
+                (civ-selected viking)
+            )
+        )
+    (can-train militiaman-line)
+=>
+    (train militiaman-line)
+)
+; NO HORSE CIVS - dont check for spearmen
+(defrule
+    (current-age == imperial-age)(gold-amount > 400)
+    (unit-type-count-total militiaman-line g:< militiaQtyHigh)
+        (or
+            (or
+                (civ-selected aztec)
+                (civ-selected mayan)
+            )
+            (or
+                (civ-selected incan)
+                (civ-selected incan)
+            )
+        )
+    (can-train militiaman-line)
+=>
+    (train militiaman-line)
+)
+; MALAY
+(defrule
+    (current-age == imperial-age)
+    (civ-selected malay)(research-completed my-unique-research)
+    (up-compare-goal dudeHasSpearmen == 1)
+    (unit-type-count-total militiaman-line g:< militiaQtyHigh)
+    (can-train militiaman-line)
+=>
+    (train militiaman-line)
+)
+; SPEARMEN
+; SPEARMEN FEUDAL AGE
+(defrule
+    (current-age == feudal-age) ;non reactive
+    (or
+        (wood-amount >= 275)
+        (building-type-count town-center > 0)
+    )
+    (wood-amount >= 125)
+    (up-compare-goal totalSoldiersCreatedThisAge < 4)
+    (can-train spearman-line)
+=>
+    (train spearman-line)
+    (up-modify-goal totalSoldiersCreatedThisAge c:+ 1)
+)
+(defrule
+    (current-age == feudal-age) ;reactive
+    (or
+        (wood-amount >= 275)
+        (building-type-count town-center > 0)
+    )
+    (or(wood-amount >= 125)
+        (or
+            (and(civ-selected japanese)(wood-amount >= 75))
+            (and(civ-selected malian)(wood-amount >= 110))
+        )
+    )
+    (up-compare-goal dudeHasCavalry == 1)
+    (up-compare-goal totalSoldiersCreatedThisAge < maximumSoldiersFeudal)
+    (unit-type-count-total spearman-line g:< spearmenQtyLow)
+    (can-train spearman-line)
+=>
+    (train spearman-line)
+    (up-modify-goal totalSoldiersCreatedThisAge c:+ 1)
+)
+(defrule
+    (current-age == feudal-age)(town-under-attack)
+    (or
+        (wood-amount >= 275) ;not optimized for civs with cheaper TC
+        (building-type-count town-center > 0)
+    )
+    (or(wood-amount >= 125)
+        (or
+            (and(civ-selected japanese)(wood-amount >= 75))
+            (and(civ-selected malian)(wood-amount >= 110))
+        )
+    )
+    (or(up-compare-goal dudeHasCavalry == 1)(up-compare-goal dudeHasCavalryArchers == 1))
+    (up-compare-goal dudeHasArchers == 0)
+    (unit-type-count-total spearman-line < spearmenQtyMedium)
+    (can-train spearman-line)
+=>
+    (train spearman-line)
+)
+; SPEARMEN CASTLE AGE
+(defrule
+    (current-age == castle-age) ;non reactive
+    (or
+        (wood-amount >= 275)
+        (building-type-count town-center > 0)
+    )
+    (wood-amount >= 125)
+    (up-compare-goal totalSoldiersCreatedThisAge < 10)
+    (can-train spearman-line)
+=>
+    (train spearman-line)
+    (up-modify-goal totalSoldiersCreatedThisAge c:+ 1)
+)
+(defrule
+    (current-age == castle-age)
+    (or(wood-amount > 275)(building-type-count town-center > 0))
+    (building-type-count-total monastery > 0)
+    (wood-amount > 125)
+    (or
+        (and(building-type-count siege-workshop == 0)
+            (building-type-count university == 0)
+        )
+        (wood-amount > 300)
+    )
+    (or(up-compare-goal dudeHasCavalry == 1)(up-compare-goal dudeHasCavalryArchers == 1))
+    (unit-type-count-total spearman-line g:< spearmenQtyMedium)
+    (can-train spearman-line)
+=>
+    (train spearman-line)
+)
+(defrule
+    (current-age == imperial-age)(gold-amount < 2000)
+    (or(wood-amount > 275)(building-type-count town-center > 0))
+    (wood-amount > 125)
+    (up-compare-goal dudeHasCavalry == 1)
+    (not(can-train coustillier))(not(can-train flemish-pikeman))
+    (not(can-train steppe-lancer-line))
+    (unit-type-count-total spearman-line g:< spearmenQtyHigh)
+    (can-train spearman-line)
+=>
+    (train spearman-line)
+)
+(defrule ;goth
+	(current-age >= feudal-age)
+	(unit-type-count-total spearman-line < 4)
+	(civ-selected gothic) ; exploring
+	(can-train spearman-line)
+=>
+	(train spearman-line)
+)
+; EAGLE WARRIOR
+(defrule
+    (current-age == feudal-age)
+    (or(up-compare-goal dudeHasArchers == 1)(up-compare-goal dudeHasSkirmishers == 1))
+    ;(gold-amount > 251)
+    (or
+        (not(enemy-buildings-in-town))
+        (research-completed ri-supplies)
+    )
+    (unit-type-count-total eagle-warrior-line g:< eagleQtyLow)
+    (can-train eagle-warrior-line)
+=>
+    (train eagle-warrior-line)
+)
+(defrule
+    (current-age == castle-age)
+    (unit-type-count-total eagle-warrior-line g:< eagleQtyMedium)
+    (can-train eagle-warrior-line)
+=>
+    (train eagle-warrior-line)
+)
+(defrule
+    (current-age == imperial-age)(gold-amount > 250)
+    (unit-type-count-total eagle-warrior-line g:< eagleQtyHigh)
+    (can-train eagle-warrior-line)
+=>
+    (train eagle-warrior-line)
+)
+; CONDOTTIERO
+(defrule
+    (unit-type-count-total condottiero g:< militiaQtyMedium)
+    (players-unit-type-count any-enemy hand-cannoneer > 3)
+    (can-train condottiero)
+=>
+    (train condottiero)
+)

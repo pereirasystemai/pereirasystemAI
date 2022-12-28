@@ -1,0 +1,32 @@
+; DETECTING CONSTANTS: 350 TO 380
+
+(defconst dudeHasCavalry 350)
+(defconst dudeHasScouts 351)
+(defconst dudeHasKnights 352)
+(defconst dudeHasCamels 353)
+(defconst dudeHasElephants 354)
+(defconst dudeHasArchers 355)
+(defconst dudeHasSkirmishers 356)
+(defconst dudeHasSpearmen 357)
+(defconst dudeHasMilitia 358)
+(defconst dudeHasCavalryArchers 359)
+(defconst dudeHasSiegeWeapons 360)
+(defconst dudeHasGalleys 361)
+(defconst dudeHasCannonShips 362)
+(defconst dudeHasFireShips 363)
+(defconst dudeHasExplosiveShips 364)
+
+(defrule
+    (true)
+=>
+    (set-goal dudeHasCavalry 0)
+    (set-goal dudeHasScouts 0)
+    (set-goal dudeHasKnights 0)
+    (set-goal dudeHasCamels 0)
+    (set-goal dudeHasElephants 0)
+    (set-goal dudeHasArchers 0)
+    (set-goal dudeHasCavalryArchers 0)
+    (set-goal dudeHasMilitia 0)
+    (set-goal dudeHasSkirmishers 0)
+    (disable-self)
+)

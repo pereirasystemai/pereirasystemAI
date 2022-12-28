@@ -1,0 +1,1686 @@
+; RESEARCHING -------------------------------------------------------
+(defrule(true)=>(chat-local-to-self "> 3. Researching Loaded")(disable-self))
+; ADVANCING AGE
+(defrule
+    (can-research feudal-age)
+    (or(unit-type-count-total villager > 6)(food-amount > 501))
+=>
+    (research feudal-age)
+)
+(defrule
+    (can-research castle-age)
+=>
+    (research castle-age)
+)
+(defrule
+    (can-research imperial-age)
+=>
+    (research imperial-age)
+)
+; LUMBER UPGRADES
+(defrule(can-research ri-double-bit-axe)(wood-amount > 150)=>(research ri-double-bit-axe))
+(defrule(can-research ri-bow-saw)=>(research ri-bow-saw))
+(defrule(can-research ri-two-man-saw)=>(research ri-two-man-saw))
+; TOWN CENTER UPGRADES
+; VILLAGER UPGRADES
+(defrule
+    (can-research ri-loom)
+    (or
+        (or
+            (enemy-buildings-in-town)
+            (unit-type-count-total monk-set g:>= monkQtyLow)
+        )
+        (or
+            (current-age == imperial-age)
+            (and(gold-amount > 250)(town-under-attack))
+        )
+    )
+=>
+    (research ri-loom)
+)
+(defrule
+    (can-research ri-wheel-barrow)
+    (or
+        (and(not(town-under-attack))(enemy-buildings-in-town))
+        (civilian-population > 5)
+    )
+=>
+    (research ri-wheel-barrow)
+)
+(defrule
+    (can-research ri-hand-cart)
+    (or
+        (or(building-type-count-total monastery > 0)
+        (players-building-type-count any-ally monastery > 0))
+        (and(civ-selected burgundians)(civilian-population > 10))
+    )
+=>
+    (research ri-hand-cart)
+)
+; BUILDING SIGHT RANGE
+(defrule
+    (can-research ri-town-watch)
+    (food-amount > 1600)
+    (current-age == imperial-age)
+=>
+    (research ri-town-watch )
+)
+(defrule
+    (can-research ri-town-patrol )
+    (food-amount > 1800)
+=>
+    (research ri-town-patrol )
+)
+; MARKET
+(defrule
+    (can-research ri-caravan )
+    (or
+        (unit-type-count-total trade-cart > 0)
+    	(unit-type-count-total trade-cog > 0)
+    )
+=>
+    (research ri-caravan )
+)
+(defrule
+    (or
+        (or
+            (wood-amount > 500)
+            (food-amount > 1000)
+        )
+        (gold-amount > 500)
+    )
+    (can-research ri-guilds)
+=>
+    (research ri-guilds)
+)
+(defrule
+    (players-building-type-count any-ally market > 0)
+    (building-type-count-total monastery > 0)
+    (can-research ri-coinage)
+=>
+    (research ri-coinage)
+)
+(defrule
+    (players-building-type-count any-ally market > 0)
+    (can-research ri-banking)
+=>
+    (research ri-banking)
+)
+; FARMS
+(defrule
+    (or
+        (and
+            (food-amount > 875)
+            (not(town-under-attack))
+        )
+        (or
+            (current-age == imperial-age)
+            (building-type-count farm > 5)
+        )
+    )
+    (building-type-count-total farm > 3)
+    (research-completed ri-double-bit-axe)
+    (wood-amount > 175)
+(can-research ri-horse-collar)
+=>
+    (research ri-horse-collar)
+)
+(defrule
+    (or(wood-amount > 225)(building-type-count lumber-camp > 2))
+ 	(research-completed ri-hand-cart)
+ 	(research-completed ri-bow-saw)
+    (can-research ri-heavy-plow)
+=>
+    (research ri-heavy-plow)
+)
+(defrule
+    (wood-amount > 350)(can-research ri-crop-rotation)
+=>
+    (research ri-crop-rotation)
+)
+; MINES
+ (defrule
+    (wood-amount > 100)
+    (building-type-count market > 0)
+    (research-completed ri-double-bit-axe)
+    (can-research ri-gold-mining)
+=>
+    (research ri-gold-mining)
+)
+(defrule
+    (wood-amount > 100)
+    (research-completed ri-hand-cart)
+    (research-completed ri-bow-saw)(research-completed ri-heavy-plow)
+    (can-research ri-gold-shaft-mining)
+=>
+    (research ri-gold-shaft-mining)
+)
+(defrule
+  	(current-age > castle-age)
+    (research-completed ri-hand-cart)(research-completed ri-bow-saw)(research-completed ri-heavy-plow)
+    (wood-amount > 100)
+    (can-research ri-stone-mining)
+=>
+    (research ri-stone-mining)
+)
+(defrule
+    (current-age == imperial-age)(wood-amount > 100)
+    (can-research ri-stone-shaft-mining)
+=>
+    (research ri-stone-shaft-mining)
+)
+; UNIQUE TECHS
+; AOK
+; BYZANTINES
+(defrule
+    (civ-selected byzantine)(unit-type-count-total fire-ship-line > 0)
+    (can-research my-second-unique-research )
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "FIRE SHIPS +1 RANGE!")
+)
+(defrule
+    (can-research my-unique-research)
+    (civ-selected byzantine)(unit-type-count-total my-unique-unit-line > 0)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "CATAFRACTS CAUSE TRAMPLE DAMAGE!")
+)
+; CELTS
+(defrule
+    (can-research ri-stronghold)
+    (or
+        (building-type-count-total castle > 0)
+        (building-type-count-total watch-tower-line > 0)
+    )
+    (or
+        (current-age == imperial-age)
+        (town-under-attack)
+    )
+=>
+    (research ri-stronghold)
+    (chat-to-player my-player-number "TOWERS AND CASTLES SHOOT 25% FASTER!")
+)
+(defrule
+    (can-research my-unique-research)
+    (civ-selected celtic)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "SIEGE WEAPONS +40% HP!")
+)
+; CHINESE
+(defrule
+    (civ-selected chinese)
+    (or
+        (or
+            (building-type-count-total watch-tower-line > 0)
+            (building-type-count-total bombard-tower > 0)
+        )
+        (building-type-count-total stone-wall-line > 0)
+    )
+    (can-research my-second-unique-research )
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "WALLS AND TOWERS +30% HP!")
+)
+(defrule
+    (civ-selected chinese)
+    (can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "UNIQUE ARCHERS +2 ATTACK, SCORPIONS +4 ATTACK!")
+)
+; FRANKS
+(defrule
+    (civ-selected frankish)(unit-type-count-total my-unique-unit-line > 0)
+    (can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "AXE THROWERS +1 RANGE!")
+)
+(defrule
+    (civ-selected frankish)(can-research my-second-unique-research )
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "STABLES WORK 40% FASTER!")
+)
+; GOTHS
+(defrule ;anarchy
+    (civ-selected gothic)
+    (current-age == imperial-age)(building-type-count barracks > 1)
+    (can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "HUSKARLS AVAILABLE AT BARRACKS!")
+)
+(defrule
+    (civ-selected gothic)(building-type-count barracks > 1)
+    (can-research my-second-unique-research)
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "BARRACKS SPEED DOUBLED!")
+)
+; BRITONS
+(defrule
+    (civ-selected briton)(can-research my-second-unique-research )
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "ARCHERS +1 RANGE, TOWERS +2 ATTACK!")
+)
+(defrule
+    (can-research my-unique-research)
+    (civ-selected briton)(unit-type-count-total trebuchet > 0)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "TREBUCHETS CAUSE BLAST DAMAGE!")
+)
+; JAPANESE
+(defrule
+    (can-research 484)
+    (building-type-count-total watch-tower-line > 2)
+=>
+    (research 484)
+    (chat-to-player my-player-number "TOWERS SHOOT EXTRA ARROWS!")
+)
+(defrule
+    (civ-selected japanese)
+    ;(can-research my-unique-research)
+    (up-can-research 0 c: my-unique-research)
+    (unit-type-count-total trebuchet > 0)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "TREBUCHETS PACK AND UNPACK FASTER!")
+)
+; MONGOLIANS
+(defrule
+    (can-research 487)
+=>
+    (research 487)
+    (chat-to-player my-player-number "WE DON´T NEED HOUSES ANYMORE!")
+)
+(defrule
+    (civ-selected mongol)(can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-local-to-self "SIEGE WEAPONS 50% FASTER!")
+)
+; PERSIANS
+(defrule
+    (civ-selected persian)(can-research my-second-unique-research)
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "ARCHERS COST NO GOLD!")
+)
+(defrule
+    (civ-selected persian)(can-research my-unique-research)
+    (unit-type-count-total my-unique-unit-line > 0)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "ELEPHANTS 30% FASTER!")
+)
+; SARACEN
+(defrule
+    (civ-selected saracen)
+    (can-research my-second-unique-research)
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "CAMELS +20 HP!")
+)
+(defrule
+    (civ-selected saracen)
+    (can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "TREBUCHETS AND MANGONELS +15% ATTACK!")
+)
+; TEUTONS
+(defrule
+    (civ-selected teutonic)(can-research my-second-unique-research )
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "SIEGE WEAPONS +4 MELEE ARMOR!")
+)
+(defrule
+    (civ-selected teutonic)(can-research my-unique-research)
+    (building-type-count-total castle > 0)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "CASTLES +3 RANGE!")
+)
+; TURKS
+(defrule
+    (or(current-age == imperial-age)(and(food-amount > 1350)(gold-amount > 950)))
+    (building-type-count archery-range > 0)
+    (can-research ri-sipahi)
+=>
+    (research ri-sipahi)
+    (chat-to-player my-player-number "CAVALRY ARCHERS +20 HP!")
+)
+(defrule
+    (civ-selected turkish)(can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "ALL TYPES OF CANNONS +3 RANGE!")
+)
+; VIKINGS
+(defrule
+    (can-research ri-chieftains)
+=>
+    (research ri-chieftains)
+    (chat-to-player my-player-number "INFANTRY CAUSES EXTRA DAMAGE TO CAVALRY!")
+)
+(defrule
+    (civ-selected viking)(can-research my-unique-research)(unit-type-count-total my-unique-unit-line > 0)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "BERSERKERS REGENERATE!")
+)
+; AOC
+; AZTECS
+(defrule
+    (can-research ri-atlatl)
+    (or
+        (unit-type-count-total skirmisher-line > 0)
+        (or
+            (unit-type-count-total genitour > 0)
+            (unit-type-count-total elite-genitour > 0)
+        )
+    )
+=>
+    (research ri-atlatl)
+    (chat-to-player my-player-number "SKIRMISHERS +1 ATTACK, +1 RANGE")
+)
+(defrule
+    (civ-selected aztec)
+    (can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "INFANTRY +4 ATTACK!")
+)
+; KOREANS
+(defrule
+    (civ-selected korean)
+    (building-type-count-total watch-tower-line > 3)
+    (can-research my-second-unique-research )
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "TOWERS +2 RANGE!")
+)
+(defrule
+    (civ-selected korean)
+    (unit-type-count-total mangonel-line > 0)
+    (can-research my-unique-research )
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "MANGONELS +1 RANGE!")
+)
+; SPANISH
+(defrule
+    (can-research ri-inquisition)
+    (current-age == imperial-age)
+=>
+    (research ri-inquisition)
+    (chat-to-player my-player-number "INQUISITION!")
+)
+(defrule
+    (civ-selected spanish)
+    (can-research my-unique-research)
+    (research-completed ri-sappers)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "SE VA A HABÉ UN FOLLÓN QUE NO VA SABE NI ONDE SA METÍO!")
+    (set-strategic-number sn-allow-civilian-defense 2)
+    (set-strategic-number sn-allow-civilian-offense 3)
+)
+; HUNS
+(defrule
+    (can-research 483)
+=>
+    (research 483)
+    (chat-to-player my-player-number "CREATE TARCANS AT STABLES!")
+)
+(defrule
+    (civ-selected hun)
+    (can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "ENEMY RELICS PRODUCE HALF THE GOLD!")
+)
+; MAYANS
+(defrule
+    (civ-selected mayan)(unit-type-count-total skirmisher-line > 0)
+    (can-research my-second-unique-research)
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "SKIRMISHERS SHOOT TWICE!")
+)
+(defrule
+    (civ-selected mayan)(unit-type-count-total eagle-warrior-line > 0)
+    (can-research my-unique-research )
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "EAGLE WARRIORS +40 HP!")
+)
+; SLAVS
+(defrule
+    (civ-selected slavic)
+    (stone-amount < 1000)
+    (can-research my-second-unique-research)
+    (current-age == imperial-age)
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "CASTLES COST LESS STONE!")
+)
+(defrule
+    (can-research ri-druzhina)
+=>
+    (research ri-druzhina)
+    (chat-to-player my-player-number "INFANTRY ATTACKS WITH BLAST DAMAGE!")
+)
+; HUNGARIANS - MAGYAR
+(defrule
+    (civ-selected magyar)
+    (can-research my-second-unique-research)
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "UNIQUE UNIT COSTS NO GOLD!")
+)
+(defrule
+    (civ-selected magyar)  (can-research my-unique-research )
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "CAVALRY ARCHERS +1 ATTACK, +1 RANGE!")
+)
+; INCA
+(defrule
+    (civ-selected incan)(can-research my-second-unique-research)
+    (or
+        (unit-type-count-total skirmisher > 0)
+        (unit-type-count-total slinger > 0)
+    )
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "SKIRMISHERS AND SLINGERS NO MINIMUM RANGE!")
+)
+(defrule
+    (civ-selected incan)(can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "KAMAYUKS, SLINGERS, EAGLE WARRIORS +1 MELEE, +2 RANGED ARMOR!")
+)
+; INDIANS - HINDUSTANIS
+(defrule
+    (civ-selected indian)
+    (can-research my-second-unique-research)
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "GOLD INCOME 10% FASTER!")
+)
+(defrule
+    (civ-selected indian)(can-research my-unique-research)
+    (current-age == imperial-age)
+    (unit-type-count-total hand-cannoneer > 0)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "HAND CANNONEERS +2 RANGE!")
+)
+; ITALIANS
+(defrule
+    (civ-selected italian)
+    (can-research my-second-unique-research )
+    (current-age == imperial-age)
+    (or
+        (or
+            (unit-type-count-total condottiero > 0)
+            (unit-type-count-total archer-line > 0)
+        )
+        (unit-type-count-total my-unique-unit-line > 0)
+    )
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "FOOR ARCHERS AND CONDOTTIERI +1 MELEE, +1 RANGED ARMOR!")
+)
+(defrule
+    (civ-selected italian)
+    (can-research my-unique-research) ; ruta de la seda
+    (or
+        (unit-type-count-total trade-cart > 0)
+        (unit-type-count-total trade-cog > 0)
+    )
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "TRADE UNITS COST HALF THE PRICE!")
+)
+; PORTUGUESE
+(defrule
+    (can-research ri-carrack)
+    (current-age == imperial-age)(building-type-count-total dock > 0)
+=>
+    (research ri-carrack)
+    (chat-to-player my-player-number "SHIPS +1 MELEE +1 RANGED ARMOR!")
+)
+(defrule
+    (can-research ri-arquebus )
+    (current-age == imperial-age)
+=>
+    (research ri-arquebus)
+    (chat-to-player my-player-number "GUNPOWDER UNITS ACCURACY INCREASED!")
+)
+; MALIAN
+(defrule
+    (can-research ri-tigui )
+    (current-age == imperial-age) (building-type-count-total town-center > 1)
+=>
+    (research ri-tigui)
+    (chat-to-player my-player-number "TOWN CENTERS SHOOT BY THEMSELVES!")
+)
+(defrule
+    (can-research my-unique-research)(civ-selected malian)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "CAVALRY +5 ATTACK!")
+)
+; ETHIOPIAN
+(defrule
+    (can-research 574); ethiop, royal
+    (unit-type-count-total my-unique-unit-line > 0)
+=>
+    (research 574)
+    (chat-to-player my-player-number "UNIQUE UNITS PRODUCED FASTER!")
+)
+(defrule
+    (can-research my-unique-research)
+    (civ-selected ethiopian)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "SIEGE WORKSHOP UNITS BLAST RADIUS INCREASED!")
+)
+; BERBER
+(defrule
+    (civ-selected berbers)
+    (can-research 578)
+    (research-completed my-unique-research)
+    (building-type-count-total castle > 1);KASBAH
+=>
+    (research 578)
+    (chat-to-player my-player-number "CASTLES WORK FASTER!")
+)
+(defrule
+    (civ-selected berbers)
+    (can-research my-unique-research)
+    (or
+        (unit-type-count-total my-unique-unit-line > 0)
+        (unit-type-count-total camel-line > 0)
+    )
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "CAMELS REGENERATE!")
+)
+; BURMESE
+(defrule
+    (can-research my-second-unique-research)
+    (civ-selected burmese)
+    (unit-type-count-total battle-elephant-line > 0)
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "ELEPHANTS +1 MELEE, + 2 RANGED ARMOR!")
+)
+(defrule
+    (can-research my-unique-research)
+    (civ-selected burmese)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "CAVALRY +6 ATTACK AGAINST BUILDINGS!")
+)
+; KHMER
+(defrule
+    (civ-selected khmer)(can-research my-second-unique-research)
+    (unit-type-count-total battle-elephant-line > 0)
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "BATTLE ELEPHANTS +3 ATAQUE!")
+)
+(defrule
+    (civ-selected khmer)(can-research my-unique-research)
+    (or(unit-type-count-total my-unique-unit-line > 0)(unit-type-count-total scorpion-line > 0))
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "BALLISTA ELEPHANTS AND SCORPIONS SHOOT TWICE!")
+)
+; MALAY
+(defrule
+    (can-research 624)
+    (building-type-count dock > 1)
+    (current-age == imperial-age)
+=>
+    (research 624)
+    (chat-to-player my-player-number "DOCKS SHOOT ARROWS!")
+)
+(defrule
+    (civ-selected malay)(can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "MILITIA COSTS NO GOLD!")
+)
+; VIETNAMESE
+(defrule
+    (civ-selected vietnamese)
+    (can-research my-second-unique-research)
+    (unit-type-count-total battle-elephant-line > 0)
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "ELEPHANTS +50 HP!")
+)
+(defrule
+    (civ-selected vietnamese)(can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "LUMBERJACKS GENERATE GOLD!")
+)
+; BULGARIANS
+(defrule
+    (civ-selected bulgarians)
+    (can-research my-second-unique-research )
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "CAVALRY ATTACKS 33% FASTER!")
+)
+(defrule
+    (civ-selected bulgarians)(unit-type-count-total militiaman-line > 0)
+    (can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "MILITIA +5 MELEE ARMOR!")
+)
+; CUMANS
+(defrule
+    (civ-selected cumans)
+    (can-research my-second-unique-research )
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number  "CAVALRY TRAINS FASTER!")
+)
+(defrule
+    (civ-selected cumans)
+    (or(players-building-type-count any-ally castle > 0)
+    (building-type-count castle > 0))
+    (can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "5 MERCENARIES IN CASTLES!")
+)
+; LITHUANIANS
+(defrule
+    (civ-selected lithuanians)(can-research my-second-unique-research)
+    (food-amount > 600)
+    (or
+        (building-type-count-total town-center > 1)
+        (town-under-attack)
+    )
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "TOWN CENTERS +3 RANGE!")
+)
+(defrule
+    (civ-selected lithuanians)(can-research my-unique-research)
+    (or
+        (unit-type-count-total spearman-line > 0)
+        (unit-type-count-total skirmisher-line > 0)
+    )
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "SPEARMEN AND SKIRMISHERS +2 RANGED ARMOR!")
+)
+; TATARS
+(defrule
+    (civ-selected tatars)(can-research my-second-unique-research )
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "CAVALRY EXCEPT KNIGHTS GETS +1 MELEE +1 RANGED ARMOR!")
+)
+(defrule
+    (civ-selected tatars)(can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "TREBUCHETS +2 RANGE!")
+)
+; BURGUNDIANS
+(defrule
+    (can-research ri-burgundian-vineyards)
+=>
+    (research ri-burgundian-vineyards)
+    (chat-to-player my-player-number "FARMS GENERATE GOLD!")
+)
+(defrule
+    (civ-selected burgundians)
+    (can-research my-unique-research)(food-amount > 1500)
+    (unit-type-count-total villager g:> knightsQtyMedium)
+    (military-population g:> knightsQtyMedium)
+    (or
+        (unit-type-count-total battering-ram > 4)
+        (unit-type-count-total trebuchet > 4)
+    )
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "REVOLUTION!")
+)
+; SICILIANS
+(defrule
+    (can-research ri-first-crusade)
+    (or
+        (building-type-count-total town-center > 2)
+        (building-type-count-total barracks > 2)
+    )
+    (current-age == imperial-age)
+=>
+    (research ri-first-crusade)
+    (chat-to-player my-player-number "5 SERJEANTS PER TOWN CENTER!")
+)
+(defrule
+    (civ-selected sicilians)(can-research my-unique-research)
+    (unit-type-count-total knight-line > 0)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "KNIGHTS +1 MELEE, +2 RANGED ARMOR!")
+)
+; BOHEMIANS
+(defrule
+    (civ-selected bohemians)
+    (can-research my-second-unique-research)
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "GUNPOWDER UNITS MOVE FASTER!")
+)
+(defrule
+    (civ-selected bohemians)(food-amount > 1000)
+    (or
+        (not(research-available ri-houfnice))(research-completed ri-houfnice)
+    )
+    (can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "MONASTERY TECHS COST FOOD INSTEAD OF GOLD!")
+)
+; POLES
+(defrule
+    (can-research ri-szlachta-privileges)
+=>
+    (research ri-szlachta-privileges)
+    (chat-to-player my-player-number "KNIGHTS GOLD COST REDUCED 60%!")
+)
+(defrule
+    (civ-selected poles)(unit-type-count-total scout-cavalry-line > 0)
+    (can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "SCOUTS CAUSE TRAMPLE DAMAGE!")
+)
+; BENGALIS
+(defrule
+    (civ-selected bengalis)
+    (can-research my-second-unique-research)
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "CHARIOTS AND ELEPHANTS ATTACK FASTER!")
+)
+(defrule
+    (civ-selected bengalis)
+    (unit-type-count villager g:> maxCiviliansCastleAge)
+    (can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "VILLAGERS TAKE 10% LESS SPACE!")
+)
+; DRAVIDIANS
+(defrule
+    (civ-selected dravidians)
+    (can-research my-second-unique-research)
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "ELEPHANTS REGENERATE!")
+)
+(defrule
+    (civ-selected dravidians)
+    (can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "INFANTRY AND CAVALRY ATTACKS IGNORE ARMOR!")
+)
+; GURJARAS
+(defrule
+    (civ-selected gurjaras)
+    (can-research my-second-unique-research)
+=>
+    (research my-second-unique-research)
+    (chat-to-player my-player-number "MILITARY UNITS COST 25% LESS FOOD!")
+)
+(defrule
+    (civ-selected gurjaras)
+    (can-research my-unique-research)
+=>
+    (research my-unique-research)
+    (chat-to-player my-player-number "CAMELS AND ELEPHANTS ARCHERS +4 MELEE ARMOR!")
+)
+; DOCK UPGRADES
+(defrule
+	(unit-type-count-total fishing-ship > 5)
+    (research-completed ri-hand-cart)(research-completed ri-bow-saw)
+    (research-completed ri-heavy-plow)
+    (can-research ri-gillnets)
+=>
+    (research ri-gillnets)
+)
+(defrule
+    (or
+        (or
+            (or
+                (players-unit-type-count any-enemy galley-line > 0)
+                (players-unit-type-count any-enemy demolition-ship-line > 0)
+            )
+            (or
+                (players-unit-type-count any-enemy cannon-galleon-line > 0)
+                (players-unit-type-count any-enemy fire-ship-line > 0)
+            )
+        )
+        (or
+            (or
+                (players-unit-type-count any-enemy turtle-ship-line > 0)
+                (players-unit-type-count any-enemy caravel-line > 0)
+            )
+            (players-unit-type-count any-enemy longboat-line > 0)
+        )
+    )
+	(can-research ri-careening)
+=>
+	(chat-local-to-self  "PIRATE ACTIVITY DETECTED!")
+	(research ri-careening)
+)
+(defrule
+    (can-research ri-dry-dock)
+=>
+    (research ri-dry-dock)
+)
+(defrule
+	(unit-type-count-total galley-line > 1)
+    (can-research ri-war-galley)
+=>
+	(research ri-war-galley)
+)
+(defrule
+    (unit-type-count-total fire-ship-line > 1)
+    (can-research ri-fast-fire-ship)
+=>
+    (research ri-fast-fire-ship)
+)
+(defrule
+	(can-research ri-galleon)
+=>
+	(research ri-galleon)
+)
+(defrule
+	(can-research ri-cannon-galleon)
+=>
+	(research ri-cannon-galleon)
+)
+(defrule
+	(unit-type-count-total cannon-galleon-line > 1)
+    (can-research ri-deck-guns)
+=>
+	(research ri-deck-guns)
+)
+(defrule
+	(or
+		(unit-type-count-total galley-line > 0)
+		(unit-type-count-total cannon-galleon-line > 0)
+	)
+    (can-research ri-shipwright)
+=>
+	(research ri-shipwright)
+)
+(defrule
+    (unit-type-count-total turtle-ship-line > 0)
+    (can-research ri-elite-turtle-ship)
+=>
+    (research ri-elite-turtle-ship)
+)
+(defrule
+    (unit-type-count-total caravel-line > 0)
+    (can-research ri-elite-caravel)
+=>
+    (research ri-elite-caravel)
+)
+(defrule
+    (unit-type-count-total longboat-line > 0)
+    (can-research ri-elite-longboat)
+=>
+    (research ri-elite-longboat)
+)
+; MILTARY UPGRADES
+; BARRACKS UPGRADES
+; COMMON
+(defrule
+    (research-completed ri-hand-cart)
+    (research-completed ri-bow-saw)
+    (research-completed ri-heavy-plow)
+    (can-research ri-squires)
+    (or(not(civ-selected mongol))(current-age == imperial-age))
+=>
+    (research ri-squires)
+)
+(defconst arson 602)
+(defrule
+    (or
+        (current-age == imperial-age)
+        (and(enemy-buildings-in-town)(unit-type-count infantry-class > 1))
+    )
+    (can-research arson)
+=>
+    (research arson )
+)
+; G. AGUILA
+(defrule
+    (unit-type-count-total eagle-warrior-line > 2)
+    (can-research ri-eagle-warrior)
+=>
+    (research ri-eagle-warrior)
+)
+(defrule
+    (unit-type-count-total eagle-warrior-line > 2)
+    (can-research ri-elite-eagle-warrior)
+=>
+    (research ri-elite-eagle-warrior)
+)
+; MILITIA
+(defrule
+    (or
+        (or
+            (or(civ-selected portuguese)(civ-selected burmese))
+            (or(civ-selected japanese)(civ-selected bulgarians))
+        )
+        (or
+            (or(civ-selected aztec)(civ-selected incan))
+            (or(civ-selected japanese)(civ-selected celtic))
+        )
+    )
+    (can-research ri-supplies)
+=>
+    (research ri-supplies)
+)
+ (defrule
+    (unit-type-count-total militiaman-line > 0)
+    (can-research ri-supplies)
+=>
+    (research ri-supplies)
+)
+(defrule
+    (or(civ-selected aztec)(civ-selected incan))
+    (can-research ri-man-at-arms)
+=>
+    (research ri-man-at-arms)
+)
+(defrule
+ 	(unit-type-count-total militiaman-line > 0)
+    (can-research ri-man-at-arms)
+    (or(not(civ-selected mongol))(current-age == imperial-age))
+=>
+    (research ri-man-at-arms)
+)
+(defrule
+    (unit-type-count-total militiaman-line > 2)
+    (or(game-time < 900)(current-age == imperial-age))
+    (can-research ri-long-swordsman)
+=>
+    (research ri-long-swordsman)
+)
+(defrule
+    (unit-type-count-total militiaman-line > 6)
+    (can-research ri-two-handed-swordsman)
+=>
+    (research ri-two-handed-swordsman)
+)
+(defrule
+    (or
+       (unit-type-count-total militiaman-line > 6)
+       (and(unit-type-count-total militiaman-line > 0)(food-amount > 4000))
+    )
+    (not(up-research-status c: 787 == research-available))
+    (can-research ri-champion)
+=>
+    (research ri-champion)
+)
+; SPEARMEN
+(defrule
+    (research-completed ri-hand-cart)
+    (research-completed ri-bow-saw)
+    ;(research-completed ri-heavy-plow)
+    (building-type-count-total monastery > 0)
+    (unit-type-count-total spearman-line > 4)
+    (can-research ri-pikeman)
+=>
+    (research ri-pikeman)
+)
+(defrule
+    (building-type-count-total monastery > 0)
+    (unit-type-count-total spearman-line > 4)
+    (can-research ri-halberdier)
+=>
+    (research ri-halberdier)
+)
+; STABLES UPGRADES
+; COMMON
+(defrule
+    (or(unit-type-count-total cavalry-class > 1)
+    (unit-type-count-total cavalry-archer-class > 2))
+    (can-research ri-bloodlines)
+=>
+    (research ri-bloodlines)
+)
+(defrule
+    (or(unit-type-count-total cavalry-class > 2)
+    (unit-type-count-total cavalry-archer-class > 2))
+    (can-research ri-husbandry)
+=>
+    (research ri-husbandry)
+)
+(defrule
+    (or(unit-type-count-total cavalry-class > 2)
+    (unit-type-count-total cavalry-archer-class > 2))
+    (can-research ri-stirrups)
+=>
+    (research ri-stirrups)
+)
+; LIGHT CAVALRY
+(defrule
+    (or
+        (or(current-age == imperial-age)(civ-selected burgundians))
+        (food-amount > 950)
+    )
+    (unit-type-count scout-cavalry-line > 4)
+    (can-research ri-light-cavalry)
+=>
+    (research ri-light-cavalry)
+)
+(defrule
+    (current-age == imperial-age)
+    (unit-type-count scout-cavalry-line > 4)
+    (can-research ri-hussar)
+=>
+    (research ri-hussar)
+)
+; WINGED HUSSAR
+(defrule
+    (current-age == imperial-age)
+    (can-research 786)
+=>
+    (research 786)
+)
+(defrule
+    (current-age == imperial-age)
+    (can-research 788)
+=>
+    (research 788)
+)
+(defrule
+    (current-age == imperial-age)
+    (can-research 789)
+=>
+    (research 789)
+)
+; CAMELS
+(defrule
+    (current-age == imperial-age)
+    (can-research ri-heavy-camel)
+=>
+    (research ri-heavy-camel)
+)
+(defrule
+    (current-age == imperial-age)
+    (can-research ri-imperial-camel)
+=>
+    (research ri-imperial-camel)
+)
+; ELEPHANTS
+(defrule
+    (can-research ri-elite-battle-elephant)
+    (current-age == imperial-age)
+=>
+    (research ri-elite-battle-elephant)
+)
+; HEAVY CAVALRY
+(defrule
+    (can-research ri-cavalier)
+    (not(civ-selected byzantine))
+    (unit-type-count-total knight-line > 3)
+=>
+    (research ri-cavalier)
+)
+(defrule
+    (can-research ri-paladin )(unit-type-count-total knight-line > 5)
+    (not(research-available ri-elite-coustillier))
+    (current-age == imperial-age)
+=>
+    (research ri-paladin)
+)
+(defrule
+    (can-research ri-elite-steppe-lancer)(unit-type-count-total 1370 > 3)
+    (current-age == imperial-age)
+=>
+    (research ri-elite-steppe-lancer))
+(defrule
+    (can-research ri-elite-shrivamsha-rider)
+    (unit-type-count-total shrivamsha-rider-line > 3)
+    (current-age == imperial-age)
+=>
+    (research ri-elite-shrivamsha-rider)
+)
+; ARCHERY RANGE UPGRADES
+; COMMON
+(defrule
+ 	(research-completed ri-hand-cart)
+ 	(or
+        (research-completed ri-two-man-saw)
+        (up-research-status c: ri-two-man-saw == research-unavailable)
+    )
+    (can-research ri-thumb-ring)
+=>
+    (research ri-thumb-ring)
+)
+; ARCHER
+(defrule
+ 	(research-completed ri-hand-cart)
+ 	(research-completed ri-bow-saw)
+    (unit-type-count-total archer-line > 2)
+    (or
+        (or
+            (players-unit-type-count any-ally monk > 4)
+            (and(gold-amount > 400)(building-type-count monastery == 0))
+        )
+        (current-age == imperial-age)
+    )
+    (can-research ri-crossbow)
+=>
+    (research ri-crossbow)
+)
+(defrule
+    (unit-type-count-total archer-line > 6)
+    (can-research ri-arbalest)
+=>
+    (research ri-arbalest)
+)
+; SKIRMISHER AND GENITOUR
+(defrule
+    (unit-type-count-total genitour > 1)
+    (can-research ri-elite-genitour)
+=>
+    (research ri-elite-genitour)
+)
+(defrule
+    (research-completed ri-hand-cart)
+    (unit-type-count-total skirmisher-line > 1)
+    (unit-type-count-total genitour-line == 0)
+    (or(not(civ-selected mongol))(current-age == imperial-age))
+    (can-research ri-elite-skirmisher)
+=>
+    (research ri-elite-skirmisher)
+)
+(defrule
+    (unit-type-count-total skirmisher-line > 1)
+    (can-research ri-imperial-skirmisher)
+=>
+    (research ri-imperial-skirmisher)
+)
+; CAVALRY ARCHERS UPGRADES
+(defrule
+    (current-age == imperial-age)
+    (unit-type-count-total cavalry-archer-class > 4)
+    (can-research ri-parthian-tactics)
+=>
+    (research ri-parthian-tactics )
+)
+(defrule
+    (current-age == imperial-age)
+    (unit-type-count-total cavalry-archer-line > 4)
+    (can-research ri-heavy-cavalry-archer)
+=>
+    (research ri-heavy-cavalry-archer)
+)
+; ELPHANT ARCHERS UPGRADES
+(defrule
+    (current-age == imperial-age)
+    (unit-type-count-total elephant-archer-line > 4)
+    (can-research ri-elite-elephant-archer)
+=>
+    (research ri-elite-elephant-archer )
+)
+; CASTLE UPGRADES
+(defrule
+    (current-age == imperial-age)
+    (or(food-amount > 500)(soldier-count > 4))
+    (can-research ri-conscription)
+=>
+    (research ri-conscription )
+)
+(defrule
+    (current-age == imperial-age)(not(civ-selected ethiopian))
+    (can-research my-unique-unit-upgrade)
+=>
+    (research my-unique-unit-upgrade)
+    ;(chat-to-player my-player-number "UNIQUE UNIT UPGRADED!")
+)
+(defrule
+    (current-age == imperial-age)
+    (building-type-count-total castle > 1)
+    (wood-amount > 1200)
+    (food-amount > 1200)
+    (can-research ri-hoardings)
+=>
+    (research ri-hoardings)
+)
+(defrule
+    (current-age == imperial-age)
+    (unit-type-count villager > 0)
+    (food-amount > 2000)
+    (gold-amount > 1000)
+    (can-research ri-sappers)
+=>
+    (research ri-sappers)
+)
+; BLACKSMITH UPGRADES
+; INFANTRY AND CAVALRY ATTACK
+ (defrule
+    (or(unit-type-count infantry-class > 0)(unit-type-count cavalry-class > 1))
+    ;(research-completed ri-hand-cart)
+    ;(research-completed ri-bow-saw)
+    ;(research-completed ri-heavy-plow)
+    (can-research ri-forging)
+=>
+    (research ri-forging)
+)
+(defrule
+    (or(town-under-attack)(current-age == imperial-age))
+    (or(unit-type-count infantry-class > 2)(unit-type-count cavalry-class > 2))
+	(or(research-completed ri-hand-cart)(food-amount > 600))
+    (research-completed ri-bow-saw)
+    (can-research ri-iron-casting)
+=>
+    (research ri-iron-casting)
+)
+(defrule
+    (or(town-under-attack)(current-age == imperial-age))
+    (or(unit-type-count infantry-class > 2)(unit-type-count cavalry-class > 2))
+    (can-research ri-blast-furnace)
+=>
+    (research ri-blast-furnace)
+)
+; INFANTRY DEFENSE
+(defrule
+    (or(town-under-attack)(current-age == imperial-age))
+    (unit-type-count-total infantry-class > 2)
+    (can-research ri-scale-mail)
+=>
+    (research ri-scale-mail)
+)
+(defrule
+    (or(town-under-attack)(current-age == imperial-age))
+    (unit-type-count-total infantry-class > 2)
+    (can-research ri-chain-mail)
+=>
+    (research ri-chain-mail)
+)
+(defrule
+    (unit-type-count-total infantry-class > 2)
+    (can-research ri-plate-mail)
+=>
+    (research ri-plate-mail)
+)
+; CAVALRY DEFENSE
+(defrule
+    (unit-type-count-total cavalry-class > 2)
+    (can-research ri-scale-barding)
+=>
+    (research ri-scale-barding)
+)
+(defrule
+    (unit-type-count-total cavalry-class > 2)
+    (can-research ri-chain-barding)
+=>
+    (research ri-chain-barding)
+)
+(defrule
+    (unit-type-count-total cavalry-class > 2)
+    (can-research ri-plate-barding)
+=>
+    (research ri-plate-barding)
+)
+; ARCHER / TOWER / TC / BOAT ATTACK
+(defrule
+    (or
+        (or(town-under-attack)(current-age == imperial-age))
+        (enemy-buildings-in-town)
+    )
+    (can-research ri-fletching)
+=>
+    (research ri-fletching)
+)
+(defrule
+    (can-research ri-bodkin-arrow)
+    (or(unit-type-count monk > 4)(current-age == imperial-age))
+=>
+    (research ri-bodkin-arrow)
+)
+(defrule
+    (can-research ri-bracer)
+=>
+    (research ri-bracer)
+)
+; ARCHER ARMOR
+(defrule
+    (or
+        (or(unit-type-count-total archery-class > 0)
+        (unit-type-count-total archery-cannon-class > 2))
+        (unit-type-count-total cavalry-archer-class > 2)
+    )
+    (research-completed ri-wheel-barrow)
+    (or(town-under-attack)(research-completed ri-hand-cart))
+    (can-research ri-padded-archer-armor)
+=>
+    (research ri-padded-archer-armor )
+)
+(defrule
+    (or
+        (or(unit-type-count-total archery-class > 0)
+        (unit-type-count-total archery-cannon-class > 2))
+        (unit-type-count-total cavalry-archer-class > 2)
+    )
+    (or(town-under-attack)(research-completed ri-hand-cart))
+    (can-research ri-leather-archer-armor )
+=>
+    (research ri-leather-archer-armor )
+)
+(defrule
+    (or(unit-type-count-total archery-class > 2)
+    (unit-type-count-total archery-cannon-class > 2))
+    (can-research ri-ring-archer-armor )
+=>
+    (research ri-ring-archer-armor )
+)
+; SIEGE WORKSHOP UPGRADES
+; MANGONEL
+(defrule
+	(unit-type-count-total mangonel-line > 2)
+    (can-research ri-onager)
+=>
+	(research ri-onager)
+)
+(defrule
+	(unit-type-count-total mangonel-line > 3)
+    (or
+        (not(research-available ri-houfnice))(research-completed ri-houfnice)
+    )
+    (can-research ri-siege-onager )
+=>
+    (research ri-siege-onager )
+)
+; SCORPION
+(defrule
+    (or
+        (unit-type-count-total scorpion-line > 3)
+        (or(civ-selected chinese)(civ-selected khmer))
+    )
+    (can-research ri-heavy-scorpion)
+=>
+    (research ri-heavy-scorpion)
+)
+; RAM
+(defrule
+	(unit-type-count-total battering-ram-line > 2)
+    (can-research ri-capped-ram)
+=>
+    (research ri-capped-ram)
+)
+(defrule
+	(unit-type-count-total battering-ram-line > 2)
+    (or
+        (not(research-available ri-houfnice))(research-completed ri-houfnice)
+    )
+    (can-research ri-siege-ram)
+=>
+    (research ri-siege-ram)
+)
+; SIEGE ELEPHANT
+(defrule
+	(unit-type-count-total armored-elephant-line > 2)
+    (can-research ri-siege-elephant)
+=>
+    (research ri-siege-elephant)
+)
+; HOUFNICE
+(defrule
+    (can-research ri-houfnice)
+=>
+    (research ri-houfnice)
+)
+; MONASTERY
+(defrule ;herbs
+    (town-under-attack)(research-completed ri-atonement)
+    (can-research 441)
+=>
+    (research 441)
+)
+(defrule
+    (unit-type-count-total monk > 1)
+    (can-research ri-fervor)
+=>
+    (research ri-fervor )
+)
+(defrule
+    (unit-type-count-total monk > 4)
+    (can-research ri-sanctity)
+=>
+    (research ri-sanctity)
+)
+(defrule
+    (current-age == imperial-age)
+	(research-completed ri-hand-cart)
+	(unit-type-count-total monk > 10)
+    (can-research ri-redemption )
+    (gold-amount > 1000)
+=>
+    (research ri-redemption )
+)
+(defrule
+    (current-age == imperial-age)
+	(research-completed ri-hand-cart)
+    (players-unit-type-count any-enemy monk > 7)
+    (gold-amount > 1100)
+    (can-research ri-heresy)
+=>
+    (research ri-heresy )
+)
+(defrule
+    (current-age == imperial-age)
+	(research-completed ri-hand-cart)
+    (or
+        (gold-amount > 800)
+        (civ-selected bohemians)
+    )
+    (unit-type-count-total monk > 10)
+    (can-research ri-atonement)
+=>
+    (research ri-atonement)
+)
+; IMPERIAL AGE MONASTERY UPGRADES
+(defrule
+    (or
+        (gold-amount > 800)
+        (civ-selected bohemians)
+    )
+	(unit-type-count-total monk > 6)
+    (not
+        (and
+            (up-research-status c: ri-halberdier == research-available)
+            (unit-type-count spearman-line > 6)
+        )
+    )
+    (can-research ri-theocracy)
+=>
+    (research ri-theocracy)
+)
+(defrule
+    (or
+        (gold-amount > 800)
+        (civ-selected bohemians)
+    )
+    (unit-type-count-total monk > 3)
+    (not
+        (and
+            (up-research-status c: ri-halberdier == research-available)
+            (unit-type-count spearman-line > 6)
+        )
+    )
+    (can-research ri-block-printing)
+=>
+    (research ri-block-printing)
+)
+(defrule
+    (or
+        (and(gold-amount > 1200)(food-amount > 1400))
+        (civ-selected bohemians)
+    )
+    (players-unit-type-count any-enemy monk > 6)
+    (not
+        (and
+            (up-research-status c: ri-halberdier == research-available)
+            (unit-type-count spearman-line > 6)
+        )
+    )
+    (can-research ri-faith)
+=>
+    (research ri-faith)
+)
+(defrule
+    (or
+        (gold-amount > 800)
+        (civ-selected bohemians)
+    )
+	(unit-type-count-total monk > 3)
+    (not
+        (and
+            (up-research-status c: ri-halberdier == research-available)
+            (unit-type-count spearman-line > 6)
+        )
+    )
+    (can-research ri-illumination)
+=>
+    (research ri-illumination)
+)
+; UNIVERSITY UPGRADES
+; CASTLE AGE UNIVERSITY UPGRADES
+(defrule
+    (current-age == imperial-age)(building-type-count-total castle > 1)
+    (food-amount > 500)
+    (can-research ri-masonry)
+=>
+    (research ri-masonry)
+)
+(defrule
+    (current-age == imperial-age)(military-population > 45)
+    (can-research ri-treadmill-crane)
+=>
+    (research ri-treadmill-crane)
+)
+(defrule
+   	(building-type-count-total stone-wall-line > 10)
+    (current-age == imperial-age)
+    (can-research ri-fortified-wall )
+=>
+    (research ri-fortified-wall )
+)
+(defrule
+    (can-research ri-ballistics )
+=>
+    (research ri-ballistics )
+)
+(defrule
+	(building-type-count-total watch-tower > 3)
+	(not(civ-selected korean))
+    (can-research ri-guard-tower)
+=>
+    (research ri-guard-tower)
+)
+(defrule
+    (or
+        (or
+            (or
+                (players-unit-type-count any-enemy galley-line > 0)
+                (players-unit-type-count any-enemy demolition-ship-line > 0)
+            )
+            (or
+                (players-unit-type-count any-enemy cannon-galleon-line > 0)
+                (players-unit-type-count any-enemy fire-ship-line > 0)
+            )
+        )
+        (or
+            (or
+                (players-unit-type-count any-enemy turtle-ship-line > 0)
+                (players-unit-type-count any-enemy caravel-line > 0)
+            )
+            (players-unit-type-count any-enemy longboat-line > 0)
+        )
+    )
+	(can-research ri-heated-shot)
+=>
+	(chat-local-to-self  "Pirate activity detected!")
+	(research ri-heated-shot)
+)
+(defrule
+	(town-under-attack)
+    (or(building-type-count-total castle > 0)
+        (building-type-count-total watch-tower-line > 1)
+    )
+    (food-amount > 600)
+    (can-research ri-murder-holes)
+=>
+    (research ri-murder-holes)
+)
+; IMPERIAL AGE UNIVERSITY UPGRADES
+(defrule
+    (building-type-count-total castle > 1)
+    (food-amount > 800)
+    (can-research ri-architecture)
+=>
+    (research ri-architecture)
+)
+(defrule
+    (can-research ri-chemistry)
+=>
+    (research ri-chemistry)
+)
+(defrule
+    (can-research ri-siege-engineers)
+=>
+    (research ri-siege-engineers)
+)
+(defrule
+    (or
+        (building-type-count-total watch-tower-line > 4)
+        (and
+            (building-type-count-total watch-tower-line > 0)
+            (and
+                (wood-amount > 9000)(food-amount > 9000)
+            )
+        )
+    )
+    (can-research ri-keep )
+=>
+    (research ri-keep )
+)
+(defrule
+    (not(research-available ri-houfnice))
+    (not(research-available ri-elite-battle-elephant))
+    (not(research-available ri-cavalier))
+    (not(research-available ri-paladin))
+    (can-research ri-bombard-tower)
+=>
+    (research ri-bombard-tower)
+)

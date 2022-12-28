@@ -1,0 +1,41 @@
+; PEREIRA SYSTEM AI - AGE OF EMPIRES II DEFINITIVE
+
+; 1 CONSTANTS
+(load "main/PereiraSystemComponents/Constants/ConstantsMain")
+(load "main/PereiraSystemComponents/Constants/ConstantsBuilding")
+(load "main/PereiraSystemComponents/Constants/ConstantsCivCharacteristics")
+(load "main/PereiraSystemComponents/Constants/ConstantsCosts")
+(load "main/PereiraSystemComponents/Constants/ConstantsDetecting")
+(load "main/PereiraSystemComponents/Constants/ConstantsFacts")
+(load "main/PereiraSystemComponents/Constants/ConstantsTraining")
+
+(load "main/PereiraSystemComponents/StrategicNumbers")
+
+(load "main/PereiraSystemComponents/Taunts")
+
+(load "main/PereiraSystemComponents/Building")
+(load "main/PereiraSystemComponents/BuildingWall")
+
+(load "main/PereiraSystemComponents/Training")
+
+(load "main/PereiraSystemComponents/Trade")
+
+(load "main/PereiraSystemComponents/Detecting")
+
+(load "main/PereiraSystemComponents/Researching")
+
+(load "main/PereiraSystemComponents/Timers_civilian")
+
+(load "main/PereiraSystemComponents/Military/MilitaryTimers")
+(load "main/PereiraSystemComponents/Military/Difficulty")
+
+
+(load "main/PereiraSystemComponents/Testing")
+
+
+; I use the cheat for making things faster sometimes
+(defrule (false)
+    (cheats-enabled)
+=>
+    (up-cc-send-cheat "AEGIS")
+)

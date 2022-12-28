@@ -1,0 +1,16 @@
+; FACTS CONSTANTS: 70 TO 120
+
+(defconst gameTime 70)
+
+(defrule
+	(true)
+=>
+	(up-get-fact game-time 0 gameTime)
+)
+
+(defconst enemyBuildingsInTown 109)
+(defrule
+	(true)
+=>
+	(up-get-fact enemy-buildings-in-town 0 enemyBuildingsInTown)
+)

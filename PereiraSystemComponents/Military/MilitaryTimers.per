@@ -1,0 +1,172 @@
+
+; COMBAT
+; DEFENSE
+(defrule
+    (true)
+=>
+    (set-strategic-number sn-allow-civilian-defense 1)
+    (disable-self)
+)
+
+(defrule
+    (game-time > 360)
+    (military-population < 2)
+=>
+    (set-strategic-number sn-allow-civilian-defense 2)
+)
+
+(defrule
+    (true)
+=>
+    (set-strategic-number sn-defense-distance 26)
+    (set-strategic-number sn-task-ungrouped-soldiers 0)
+    (disable-self)
+)
+
+(defrule ;DEFENSE PRIORITIES
+	(true)
+=>
+	(up-set-defense-priority c: lumber-camp c: 20000)
+	(up-set-defense-priority c: mining-camp c: 20000)
+	(up-set-defense-priority c: farm c: 20000)
+	(disable-self)
+)
+
+(defrule ;OFFENSE PRIORITIES
+	(true)
+=>
+    (up-set-offense-priority c: university c: 1)
+    (up-set-offense-priority c: blacksmith c: 1)
+    (up-set-offense-priority c: lumber-camp c: 2)
+    (up-set-offense-priority c: mining-camp c: 2)
+    (up-set-offense-priority c: siege-workshop c: 3)
+    (up-set-offense-priority c: house c: 4)
+    (up-set-offense-priority c: villager c: 4)
+    (up-set-offense-priority c: town-center c: 5)
+	(up-set-offense-priority c: castle c: 6)
+	(up-set-offense-priority c: cavalry-class c: 11)
+	(up-set-offense-priority c: archery-class c: 5)
+	(disable-self)
+)
+; ATTACK
+; CHOOSING TARGET
+(defrule
+    (true)
+=>
+    (set-strategic-number sn-free-siege-targeting 0)
+    (set-strategic-number sn-enemy-sighted-response-distance 25)
+    (set-strategic-number sn-wall-targeting-mode 1)
+    (set-strategic-number sn-attack-intelligence 1)
+    (set-strategic-number sn-target-evaluation-distance 10)
+    (set-strategic-number sn-coop-share-attacking 1)
+    (set-strategic-number sn-target-evaluation-boat 10)
+    (disable-self)
+)
+
+(defrule
+    (true)
+=>
+    (set-strategic-number sn-enable-offensive-priority 1)
+    (set-strategic-number sn-local-targeting-mode 2)
+    (set-strategic-number sn-ignore-attack-group-under-attack 0)
+    (set-strategic-number sn-enable-patrol-attack 1)
+    (set-strategic-number sn-percentage-explore-exterminators 50)
+    (set-strategic-number sn-disable-defend-groups 0)
+    (set-strategic-number sn-relic-return-distance 17)
+    (set-strategic-number sn-allow-civilian-offense 0)
+    ;(set-strategic-number sn-number-civilian-militia 100)
+	(set-strategic-number sn-garrison-rams 1)
+    (set-strategic-number sn-gather-idle-soldiers-at-center 1)
+    (disable-self)
+)
+
+(defrule
+    (true)
+=>
+    (set-strategic-number sn-group-form-distance 24) ;def 20
+    (set-strategic-number sn-attack-group-gather-spacing 2)
+    (set-strategic-number sn-percent-attack-soldiers 100)
+    (set-strategic-number sn-attack-group-size-randomness 0)
+    (set-strategic-number sn-minimum-attack-group-size 8)
+    (set-strategic-number sn-maximum-attack-group-size 8)
+    (set-strategic-number sn-number-attack-groups 0)
+    (disable-self)
+)
+
+; BOATS
+(defrule
+    (true)
+=>
+    (set-strategic-number sn-minimum-boat-attack-group-size 1)
+    (set-strategic-number sn-maximum-boat-attack-group-size 150)
+    (set-strategic-number sn-number-boat-attack-groups 1)
+    (set-strategic-number sn-number-boat-explore-groups 2)
+    (disable-self)
+)
+; ATTACK TIMER 21
+(defrule
+    (up-players-in-game enemy > 0)
+=>
+    (enable-timer 21 1800)
+    (disable-self)
+)
+; ATTACK!
+(defrule
+    (timer-triggered 21)
+    (up-players-in-game enemy > 0)
+    (military-population > 0)
+=>
+	(disable-timer 21)
+    (enable-timer 21 60)
+    (set-strategic-number sn-number-attack-groups 1)
+    (set-strategic-number sn-minimum-attack-group-size 50)
+    (set-strategic-number sn-maximum-attack-group-size 150)
+    (set-strategic-number sn-percent-attack-soldiers 100)
+	(set-strategic-number sn-garrison-rams 1)
+    (set-strategic-number sn-target-player-number 0)
+    (set-goal weAreAttacking 1)
+    (attack-now)
+    (chat-to-allies "31 Attack!")
+)
+(defrule
+    (military-population > 25)
+    (not(town-under-attack))
+=>
+    (set-strategic-number sn-task-ungrouped-soldiers 1)
+    (chat-local-to-self ">>> Soldiers spread!")
+    (disable-self)
+)
+
+(defrule(up-players-in-game enemy > 0)=>(enable-timer 22 3300)(disable-self)) ; 55 min
+(defrule
+    (or
+        (timer-triggered 22)
+        (and(civ-selected burgundians)(research-completed my-unique-research))
+    )
+    (population-headroom == 0)
+    (housing-headroom == 0)
+=>
+	(disable-timer 22)
+    (enable-timer 22 30)
+    (chat-local-to-self ">>> Final Attack! No Retreating*!")
+    (set-strategic-number sn-number-attack-groups 1)
+    (set-strategic-number sn-minimum-attack-group-size 1)
+    (set-strategic-number sn-maximum-attack-group-size 150)
+    (set-strategic-number sn-percent-attack-soldiers 100)
+    (set-strategic-number sn-maximum-town-size 512)
+    ;(set-goal weAreAttacking 1)
+    (attack-now)
+    (chat-to-allies "48 Final Attack!")
+)
+
+; RETREAT
+(defrule
+	(current-age == imperial-age)(up-players-in-game enemy > 0)
+    (military-population < 2)
+    (players-building-type-count focus-player castle > 0)
+=>
+	(up-retreat-now)
+    (set-strategic-number sn-task-ungrouped-soldiers 1)
+    (chat-to-allies "45 I Have No Soldiers To Destroy A Castle!")
+	(disable-self)
+)

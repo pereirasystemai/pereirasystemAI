@@ -1,0 +1,97 @@
+; GUARD
+(defrule
+    (unit-type-count monk > 0)
+=>
+    (up-full-reset-search)
+    (up-find-local c: spearman-line c: 1)
+	;(up-find-local c: all-units-class c: 240)
+	;(up-remove-objects search-local object-data-hitpoints < 50)
+    (up-guard-unit monk c: spearman-line)
+)
+; REMOVE CHEAP UNITS
+(defrule
+	(current-age == imperial-age)
+    (population-headroom == 0)
+    (housing-headroom == 0)
+    (wood-amount > 1000)(food-amount > 1000)(gold-amount > 1000)
+    (game-time > 2100); 35 min
+    (unit-type-count skirmisher-line > 0)
+    (can-train hand-cannoneer)
+=>
+	(delete-unit skirmisher-line)
+    (train hand-cannoneer)
+    (chat-local-to-self "'CHANGING' SKIRMISHERS FOR HAND CANNONEERS")
+)
+(defrule
+	(current-age == imperial-age)
+    (population-headroom == 0)
+    (housing-headroom == 0)
+    (wood-amount > 1300)(food-amount > 1300)(gold-amount > 1300)
+    (game-time > 2100); 35 min
+    (not(civ-selected gothic))(not(civ-selected japanese))
+    (unit-type-count spearman-line > 0)
+    (can-train knight-line)
+=>
+	(delete-unit spearman)(delete-unit pikeman)(delete-unit halberdier)
+    (train knight-line)
+    (chat-local-to-self "'CHANGING' SPEARMEN FOR KNIGHTS")
+)
+(defrule
+	(not	(player-in-game any-ally))
+	(unit-type-count trade-cart > 0)
+=>
+	(delete-unit trade-cart)
+)
+; experimental strategy to move the city to the coast
+  (defrule (false)
+    ; can build dock doesnt really check the water
+    (can-build dock)
+    (not(up-research-status c: feudal-age == research-pending))
+    (not(up-research-status c: ri-wheel-barrow == research-pending))
+    (current-age < castle-age)
+    (wood-amount > 325)
+    (building-type-count lumber-camp > 0)
+    (or
+        (civ-selected italian)
+        (or
+            (civ-selected spanish)(civ-selected malay)
+        )
+    )
+    (enemy-buildings-in-town)
+    (building-type-count-total dock < 1)
+=>
+    (chat-to-player my-player-number "MOVING TO THE COAST!")
+    (set-strategic-number sn-town-center-placement lumber-camp)
+    (up-modify-sn sn-mining-camp-max-distance c:+ 64)
+    (up-modify-sn sn-lumber-camp-max-distance c:+ 64)
+    (up-assign-builders c: dock c:+ 3)
+    (build dock)(delete-building town-center)
+    (build town-center)
+    (set-strategic-number sn-maximum-food-drop-distance 0)
+    (set-goal weMovedPlace 1)
+    (delete-building farm)(delete-building farm)(delete-building farm)
+    (disable-self)
+)
+(defrule
+    (up-compare-goal weMovedPlace > 0)
+    (building-type-count town-center < 1)
+    (building-type-count farm > 0)
+=>
+    (delete-building farm)(delete-building mill)
+    (delete-building archery-range)(delete-building barracks)
+    ;(up-modify-sn sn-food-gatherer-percentage c: -12)
+    ;(up-modify-sn sn-gold-gatherer-percentage c: +8)
+    ;(set-strategic-number sn-maximum-gold-drop-distance 6)
+    ;(up-modify-sn sn-stone-gatherer-percentage c: +4)
+    (chat-local-to-self "Deleting farms cause no town center")
+)
+(defrule
+    (up-compare-goal weMovedPlace > 0)
+    (building-type-count town-center > 0)
+    (building-type-count dock > 0)
+    (building-type-count lumber-camp > 0)
+=>
+    (set-strategic-number sn-maximum-food-drop-distance 19)
+    (chat-local-to-self "FOOD DROP DISTANCE = 19")
+    (disable-self)
+)

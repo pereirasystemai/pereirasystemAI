@@ -1,0 +1,66 @@
+; DIFFICULTY LEVELS
+(defrule
+    (true)
+=>  (set-strategic-number sn-do-not-scale-for-difficulty-level 1)
+    (disable-self)
+)
+
+#load-if-defined DIFFICULTY-EASIEST
+(defrule
+    (true)
+=>
+    (set-difficulty-parameter ability-to-dodge-missiles 25)
+	(set-difficulty-parameter ability-to-maintain-distance 25)
+    (disable-self)
+)
+#end-if
+
+#load-if-defined DIFFICULTY-STANDARD
+(defrule
+    (true)
+=>
+    (set-difficulty-parameter ability-to-dodge-missiles 50)
+	(set-difficulty-parameter ability-to-maintain-distance 50)
+    (disable-self)
+)
+#end-if
+
+#load-if-defined DIFFICULTY-MODERATE
+(defrule
+    (true)
+=>
+    (set-difficulty-parameter ability-to-dodge-missiles 75)
+	(set-difficulty-parameter ability-to-maintain-distance 75)
+    (disable-self)
+)
+#end-if
+
+#load-if-defined DIFFICULTY-HARD
+(defrule
+    (true)
+=>
+    (set-difficulty-parameter ability-to-dodge-missiles 0)
+	(set-difficulty-parameter ability-to-maintain-distance 0)
+    (disable-self)
+)
+#end-if
+
+#load-if-defined DIFFICULTY-HARDEST
+(defrule
+    (true)
+=>
+    (set-difficulty-parameter ability-to-dodge-missiles 0)
+	(set-difficulty-parameter ability-to-maintain-distance 0)
+    (disable-self)
+)
+#end-if
+
+#load-if-defined DIFFICULTY-EXTREME
+(defrule
+    (true)
+=>
+    (set-difficulty-parameter ability-to-dodge-missiles 0)
+	(set-difficulty-parameter ability-to-maintain-distance 0)
+    (disable-self)
+)
+#end-if

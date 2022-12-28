@@ -1,0 +1,171 @@
+; TAUNTS AND PLAYER NAMES -------------------------------------------------------
+; TESTING -------------------------------------------------------
+(defrule(true)=>(chat-local-to-self "> 3. Taunts Loaded")(disable-self))
+(defrule(civ-selected aztec)=>(up-change-name "PereiraSystem AZTC"))
+(defrule(civ-selected bengalis)=>(up-change-name "PereiraSystem BENG"))
+(defrule(civ-selected berbers)=>(up-change-name "PereiraSystem BERB"))
+(defrule(civ-selected bohemians)=>(up-change-name "PereiraSystem BOHE"))
+(defrule(civ-selected briton)=>(up-change-name "PereiraSystem BRIT"))
+(defrule(civ-selected bulgarians)=>(up-change-name "PereiraSystem BULG"))
+(defrule(civ-selected burgundians)=>(up-change-name "PereiraSystem BURG"))
+(defrule(civ-selected burmese)=>(up-change-name "PereiraSystem BURM"))
+(defrule(civ-selected byzantine)=>(up-change-name "PereiraSystem BYZN"))
+(defrule(civ-selected celtic)=>(up-change-name "PereiraSystem CELT"))
+(defrule(civ-selected chinese)=>(up-change-name "PereiraSystem CHIN"))
+(defrule(civ-selected cumans)=>(up-change-name "PereiraSystem CMNS"))
+(defrule(civ-selected dravidians)=>(up-change-name "PereiraSystem DRAV"))
+(defrule(civ-selected ethiopian)=>(up-change-name "PereiraSystem ETHI"))
+(defrule(civ-selected frankish)=>(up-change-name "PereiraSystem FRNK"))
+(defrule(civ-selected gothic)=>(up-change-name "PereiraSystem GOTH"))
+(defrule(civ-selected gurjaras)=>(up-change-name "PereiraSystem GURJ"))
+(defrule(civ-selected indian)=>(up-change-name "PereiraSystem HIND"))
+(defrule(civ-selected hun)=>(up-change-name "PereiraSystem HUNS"))
+(defrule(civ-selected incan)=>(up-change-name "PereiraSystem INCA"))
+(defrule(civ-selected italian)=>(up-change-name "PereiraSystem ITAL"))
+(defrule(civ-selected japanese)=>(up-change-name "PereiraSystem JAPN"))
+(defrule(civ-selected khmer)=>(up-change-name "PereiraSystem KHMR"))
+(defrule(civ-selected korean)=>(up-change-name "PereiraSystem KORE"))
+(defrule(civ-selected lithuanians)=>(up-change-name "PereiraSystem LITH"))
+(defrule(civ-selected magyar)=>(up-change-name "PereiraSystem MAGY"))
+(defrule(civ-selected malay)=>(up-change-name "PereiraSystem MLAY"))
+(defrule(civ-selected malian)=>(up-change-name "PereiraSystem MALI"))
+(defrule(civ-selected mayan)=>(up-change-name "PereiraSystem MAYA"))
+(defrule(civ-selected mongol)=>(up-change-name "PereiraSystem MONG"))
+(defrule(civ-selected persian)=>(up-change-name "PereiraSystem PERS"))
+(defrule(civ-selected poles)=>(up-change-name "PereiraSystem POLE"))
+(defrule(civ-selected portuguese)=>(up-change-name "PereiraSystem PORT"))
+(defrule(civ-selected saracen)=>(up-change-name "PereiraSystem SARR"))
+(defrule(civ-selected sicilians)=>(up-change-name "PereiraSystem SICI"))
+(defrule(civ-selected slavic)=>(up-change-name "PereiraSystem SLAV"))
+(defrule(civ-selected spanish)=>(up-change-name "PereiraSystem SPAN"))
+(defrule(civ-selected tatars)=>(up-change-name "PereiraSystem TATR"))
+(defrule(civ-selected teutonic)=>(up-change-name "PereiraSystem TEUT"))
+(defrule(civ-selected turkish)=>(up-change-name "PereiraSystem TURK"))
+(defrule(civ-selected vietnamese)=>(up-change-name "PereiraSystem VIET"))
+(defrule(civ-selected viking)=>(up-change-name "PereiraSystem VKNG"))
+; SEND TAUNTS TO OTHERS
+; WHEN TOWN UNDER ATTACK
+(defrule
+	(town-under-attack)
+	(up-compare-sn sn-maximum-town-size < 40)
+	(game-time < 1500) ; 25 min
+	(up-timer-status 40 == timer-disabled)
+=>
+    (enable-timer 40 1)
+)
+(defrule
+	(timer-triggered 40)
+	(game-time < 1500)
+	(town-under-attack)
+=>
+    (disable-timer 40)
+	(enable-timer 40 90)
+	(chat-to-allies "48 Help! My Town Is Under Attack!")
+)
+(defrule
+	(timer-triggered 40)
+	(not(town-under-attack))
+=>
+    (disable-timer 40)
+)
+; WHEN ENEMY BUILDINGS IN TOWN
+(defrule
+	(enemy-buildings-in-town)
+	(up-compare-sn sn-maximum-town-size < 30)
+	(game-time < 1500) ; 25 min
+	(up-timer-status 41 == timer-disabled)
+=>
+    (enable-timer 41 1)
+)
+(defrule
+	(enemy-buildings-in-town)
+	(game-time < 1500)
+	(timer-triggered 41)
+=>
+    (disable-timer 41)
+	(enable-timer 41 90)
+	(chat-to-allies "48 Help! Enemy Buildings In My Town!")
+)
+(defrule
+	(timer-triggered 41)
+	(not(enemy-buildings-in-town))
+=>
+    (disable-timer 41)
+)
+; RESPOND TO TAUNTS
+; ATTACK TAUNT 31
+(defrule
+	(taunt-detected any-ally 31)
+	(military-population >= 1)
+=>
+	(attack-now)
+	(acknowledge-taunt any-ally 31)
+    (chat-to-player this-any-ally "I´m Already Attacking!!")
+)
+(defrule
+	(taunt-detected any-ally 31)
+	(up-players-in-game enemy == 0)
+=>
+	(acknowledge-taunt any-ally 31)
+    (chat-to-allies "We Have No Enemies Retard!")
+)
+; HELP TAUNT 48
+; REJECT
+(defrule
+	(taunt-detected any-ally 48)
+	(game-time > 1500)
+=>
+	(acknowledge-taunt any-ally 48)
+    (chat-to-allies "Just Attack The Enemy Base!")
+)
+(defrule
+	(taunt-detected any-ally 48)
+	(enemy-buildings-in-town)
+=>
+	(acknowledge-taunt any-ally 48)
+    (chat-to-allies "I Can´t Help You, Enemy Buildings In My Town!")
+)
+(defrule
+	(taunt-detected any-ally 48)
+	(town-under-attack)
+=>
+	(acknowledge-taunt any-ally 48)
+    (chat-to-allies "I Can´t Help You, Im Under Attack!")
+)
+(defrule
+	(taunt-detected any-ally 48)
+	(military-population == 0)
+=>
+	(acknowledge-taunt any-ally 48)
+    (chat-to-allies "I Can´t Help You, I Have No Soldiers Dude!")
+)
+; ACCEPT
+(defrule
+	(taunt-detected any-ally 48)
+=>
+	(acknowledge-taunt any-ally 48)
+    ;(set-strategic-number sn-task-ungrouped-soldiers 1)
+	(set-strategic-number sn-target-player-number -1) ;put back to 0 when??
+	; sn-coop-share-attacking SET TO 1
+    (chat-to-allies "My Attacks Will Be Directed Around Your Town Center For 2 Minutes!")
+)
+; DISABLE HELP
+(defrule
+	(up-compare-sn sn-target-player-number == -1) ; (attacks directed to ally)
+=>
+    (enable-timer 49 120)
+)
+(defrule
+	(timer-triggered 49)
+=>
+    (disable-timer 49)
+	(set-strategic-number sn-target-player-number 0)
+    (chat-to-allies "Back To Attacking The Frontlines!")
+)
+; RETREAT TAUNT 45
+(defrule
+	(taunt-detected any-ally 45)
+=>
+	(acknowledge-taunt any-ally 45)
+	(chat-to-allies "Ok, We Retreat!")
+)

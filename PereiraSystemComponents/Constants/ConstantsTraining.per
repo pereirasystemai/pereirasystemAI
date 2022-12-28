@@ -1,0 +1,221 @@
+; TRAINING CONSTANTS 380 TO MAX LIMIT
+
+; TRAINED UNITS COUNT 380 TO 400
+(defconst maximumSoldiersFeudal 380)
+(defconst totalSoldiersCreatedThisAge 381)
+(defconst nonUpgradedUniqueUnitsCreated 382)
+
+; TRAINING UNITS QTY 400 TO 512
+; civilian units qty
+(defconst maxCiviliansDarkAge 400)
+(defconst maxCiviliansFeudalAge 401)
+(defconst maxCiviliansCastleAge 402)
+(defconst maxCiviliansImperialAge 403)
+(defconst tradeCartsQty 404)
+(defconst tradeShipsQty 405)
+(defconst fishingShipsQty 406)
+
+; unique units qty
+(defconst uniqueUnitQtyLow 446)
+(defconst uniqueUnitQtyMedium 447)
+(defconst uniqueUnitQtyHigh 448)
+(defconst galleyQty 449)
+(defconst galleonQty 450)
+(defconst fireshipQty 451)
+(defconst demolitionShipQty 452)
+(defconst specialShipQty 453)
+
+; infantry units qty
+(defconst spearmenQtyLow 454)
+(defconst spearmenQtyMedium 455)
+(defconst spearmenQtyHigh 456)
+(defconst militiaQtyLow 457)
+(defconst militiaQtyMedium 458)
+(defconst militiaQtyHigh 459)
+(defconst eagleQtyLow 460)
+(defconst eagleQtyMedium 461)
+(defconst eagleQtyHigh 462)
+; ranged units qty
+(defconst archerQtyLow 463)
+(defconst archerQtyMedium 464)
+(defconst archerQtyHigh 465)
+(defconst skirmisherQtyLow 466)
+(defconst skirmisherQtyMedium 467)
+(defconst skirmisherQtyHigh 468)
+(defconst cavalryArcherQtyLow 469)
+(defconst cavalryArcherQtyMedium 470)
+(defconst cavalryArcherQty 471)
+(defconst cavalryArcherQtyHigh 472)
+(defconst handCannoneerQty 473)
+; cavalry units qty
+(defconst knightsQtyLow 474)
+(defconst knightsQtyMedium 475)
+(defconst knightsQtyHigh 476)
+(defconst scoutsQtyLow 477)
+(defconst scoutsQtyMedium 478)
+(defconst scoutsQtyHigh 479)
+(defconst camelQtyLow 480)
+(defconst camelQtyMedium 481)
+(defconst camelQtyHigh 482)
+(defconst battleElephantQtyLow 483)
+(defconst battleElephantQtyMedium 484)
+(defconst battleElephantQtyHigh 485)
+; priest units qty
+(defconst monkQtyLow 490)
+(defconst monkQtyMedium 491)
+(defconst monkQtyHigh 492)
+; siege units qty
+(defconst ramQtyLow 495)
+(defconst ramQtyMedium 496)
+(defconst ramQtyHigh 497)
+(defconst scorpionQty 498)
+(defconst mangonelQtyLow 499)
+(defconst mangonelQtyMedium 500)
+(defconst bombardCannonsQty 501)
+(defconst trebuchetsQtyLow 502)
+(defconst trebuchetsQtyMedium 503)
+(defconst trebuchetsQtyHigh 504)
+
+(defrule
+    (current-age == castle-age)
+=>
+    (set-goal totalSoldiersCreatedThisAge 0)
+    (disable-self)
+)
+(defrule
+    (true)
+=>
+    (set-goal maximumSoldiersFeudal 30)
+    (set-goal totalSoldiersCreatedThisAge 0)
+    (set-goal nonUpgradedUniqueUnitsCreated 0)
+    (disable-self)
+)
+
+(defrule
+    (true)
+=>
+    (set-goal maxCiviliansDarkAge 16)
+    (set-goal tradeCartsQty 14)
+    (set-goal tradeShipsQty 20)
+    (set-goal fishingShipsQty 6)
+    (set-goal maxCiviliansFeudalAge 32)
+    (set-goal maxCiviliansCastleAge 53)
+    (set-goal maxCiviliansImperialAge 85)
+    (disable-self)
+)
+
+(defrule
+    (current-age == feudal-age)
+=>
+    (up-modify-goal fishingShipsQty c:* 1,1)
+    (disable-self)
+)
+
+(defrule
+    (current-age == castle-age)
+=>
+    (up-modify-goal tradeCartsQty c:* 1,5)
+    (up-modify-goal tradeShipsQty c:* 1,5)
+    (up-modify-goal fishingShipsQty c:* 1,1)
+    (disable-self)
+)
+
+(defrule
+    (current-age == imperial-age)
+=>
+    (up-modify-goal tradeCartsQty c:* 1,5)
+    (up-modify-goal tradeShipsQty c:* 1,5)
+    (up-modify-goal fishingShipsQty c:* 1,1)
+    (disable-self)
+)
+
+(defrule
+    (true)
+=>
+    (set-goal spearmenQtyLow 6)
+    (set-goal spearmenQtyMedium 35)
+    (set-goal spearmenQtyHigh 60)
+    (set-goal militiaQtyLow 8)
+    (set-goal militiaQtyMedium 20)
+    (set-goal militiaQtyHigh 60)
+    (set-goal eagleQtyLow 8)
+    (set-goal eagleQtyMedium 16)
+    (set-goal eagleQtyHigh 40)
+    (set-goal archerQtyLow 8)
+    (set-goal archerQtyMedium 16)
+    (set-goal archerQtyHigh 40)
+    (set-goal skirmisherQtyLow 8)
+    (set-goal skirmisherQtyMedium 16)
+    (set-goal skirmisherQtyHigh 30)
+    (set-goal cavalryArcherQtyLow 12)
+    (set-goal cavalryArcherQtyMedium 18)
+    (set-goal cavalryArcherQtyHigh 40)
+    (set-goal handCannoneerQty 30)
+    (set-goal knightsQtyLow 4)
+    (set-goal knightsQtyMedium 20)
+    (set-goal knightsQtyHigh 40)
+    (set-goal scoutsQtyLow 8)
+    (set-goal scoutsQtyMedium 30)
+    (set-goal scoutsQtyHigh 40)
+    (set-goal camelQtyLow 5)
+    (set-goal camelQtyMedium 15)
+    (set-goal camelQtyHigh 28)
+    (disable-self)
+)
+
+(defrule
+    (true)
+=>
+    (set-goal monkQtyLow 5)
+    (set-goal monkQtyMedium 8)
+    (set-goal monkQtyHigh 16)
+    (set-goal ramQtyLow 2)
+    (set-goal ramQtyMedium 6)
+    (set-goal ramQtyHigh 8)
+    (set-goal scorpionQty 4)
+    (set-goal mangonelQtyLow 4)
+    (set-goal mangonelQtyMedium 9)
+    (set-goal bombardCannonsQty 8)
+    (set-goal uniqueUnitQtyLow 10)
+    (set-goal uniqueUnitQtyMedium 24)
+    (set-goal uniqueUnitQtyHigh 40)
+    (set-goal trebuchetsQtyLow 6)
+    (set-goal trebuchetsQtyMedium 8)
+    (set-goal trebuchetsQtyHigh 12)
+    (disable-self)
+)
+
+(defrule
+    (true)
+=>
+    (set-goal galleyQty 20)
+    (set-goal galleonQty 20)
+    (set-goal fireshipQty 20)
+    (set-goal demolitionShipQty 20)
+    (set-goal specialShipQty 20)
+    (disable-self)
+)
+
+(defrule
+    (civ-selected sicilians)
+=>
+    (up-modify-goal knightsQtyLow c:* 1,8)
+    (up-modify-goal knightsQtyMedium c:* 1,8)
+    (up-modify-goal scoutsQtyLow c:* 1,8)
+    (up-modify-goal scoutsQtyMedium c:* 1,8)
+    (disable-self)
+)
+
+(defrule
+    (civ-selected burgundians)
+    ;(civ-selected berbers)
+=>
+    (up-modify-goal scoutsQtyLow c:+ 4)
+    (up-modify-goal skirmisherQtyLow c:- 3)
+    (up-modify-goal scoutsQtyLow c:+ 4)
+    (up-modify-goal skirmisherQtyMedium c:- 5)
+    (up-modify-goal archerQtyLow c:- 3)
+    (up-modify-goal militiaQtyLow c:- 3)
+    (up-modify-goal knightsQtyLow c:+ 5)
+    (disable-self)
+)
