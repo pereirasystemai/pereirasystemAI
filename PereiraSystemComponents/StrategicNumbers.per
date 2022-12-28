@@ -448,7 +448,7 @@
 ; CHANGE PERCENTAGES WHEN TOO MANY OF SOMETHING - THEY TEND TO GET MORE GOLD THAN NEEDED
 ; EXCESS FOOD
 (defrule
-    (food-amount > 2500)(wood-amount < 500)
+    (food-amount > 1500)(wood-amount < 500)
 =>
     (up-modify-sn sn-food-gatherer-percentage c: -16)
     (up-modify-sn sn-wood-gatherer-percentage c: +16)
@@ -456,7 +456,7 @@
     (disable-self)
 )
 (defrule
-    (food-amount > 2600)(gold-amount < 500)
+    (food-amount > 1600)(gold-amount < 500)
 =>
     (up-modify-sn sn-food-gatherer-percentage c: -8)
     (up-modify-sn sn-gold-gatherer-percentage c: +8)
@@ -465,7 +465,7 @@
 )
 ; EXCESS WOOD
 (defrule
-    (wood-amount > 2500)(food-amount < 500)
+    (wood-amount > 1500)(food-amount < 500)
 =>
     (up-modify-sn sn-wood-gatherer-percentage c: -16)
     (up-modify-sn sn-food-gatherer-percentage c: +16)
@@ -473,7 +473,7 @@
     (disable-self)
 )
 (defrule
-    (wood-amount > 2600)(gold-amount < 500)
+    (wood-amount > 1600)(gold-amount < 500)
 =>
     (up-modify-sn sn-wood-gatherer-percentage c: -8)
     (up-modify-sn sn-gold-gatherer-percentage c: +8)
